@@ -116,6 +116,14 @@ svg{stroke:currentColor;fill:none;stroke-width:1.7}
 .evi{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}.evi:last-child{border:0}
 .dash-row{border-radius:8px;margin:0 -8px;padding-left:8px!important;padding-right:8px!important}
 .dash-row:hover{background:rgba(0,0,0,.04)}
+.doc-content h1{font-size:26px;font-weight:900;margin-bottom:10px}
+.doc-content h2{font-size:19px;font-weight:800;margin:34px 0 14px;padding-top:20px;border-top:1px solid var(--border)}
+.doc-content h2:first-child{margin-top:0;padding-top:0;border-top:0}
+.doc-content h3{font-size:15px;font-weight:700;margin:22px 0 8px;color:var(--violet-ink)}
+.doc-content p{margin:0 0 12px;font-size:14px;line-height:1.75;color:var(--ink)}
+.doc-content ul{margin:0 0 12px;padding-left:20px;font-size:14px;line-height:1.8;color:var(--muted)}
+.doc-content li{margin-bottom:2px}
+.doc-content img{display:block;width:100%;max-width:520px;border-radius:12px;border:1px solid var(--border);box-shadow:var(--shadow-sm);margin:10px 0 16px}
 .evi .d{width:44px;flex:none;text-align:center;border:1px solid var(--border);border-radius:10px;padding:6px 0;background:var(--raise)}
 .evi .d b{display:block;font-family:"Pretendard";font-weight:800;font-size:15px;line-height:1}.evi .d small{font-size:9.5px;color:var(--faint)}
 .evi p{margin:0;font-size:13px;font-weight:500}.evi small{color:var(--faint)}

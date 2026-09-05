@@ -63,6 +63,32 @@ supabase/
   seed.sql            # 데모 데이터
 ```
 
+## 문서(기획서) — `/docs`
+
+기획서를 Claude 계정 없이도 볼 수 있고, 댓글·버전 기록까지 되는 자체 페이지로 넣었습니다.
+
+- **내용**: `src/content/docs/<slug>.html` (순수 HTML 조각, 스타일은 `globals.css`의 `.doc-content`가 담당)
+- **버전 기록**: 별도 DB 없이 **git 커밋 이력**을 그대로 씁니다 (`/docs/[slug]/history`). 문서를 고치고 `git commit`하면 그게 새 버전이 됩니다.
+  ```bash
+  # 예: 기획서 내용을 고친 뒤
+  git add src/content/docs/arki-spec.html
+  git commit -m "기획서: OO 섹션 내용 업데이트"
+  ```
+- **댓글**: `data/doc-comments.json`에 저장됩니다 (서버 파일 기반이라 브라우저와 무관하게 모든 방문자가 같은 댓글을 봄).
+
+### ⚠️ 배포 시 꼭 알아야 할 것 (파일 기반 저장의 한계)
+댓글(`data/doc-comments.json`)과 과제 제출 파일(`public/uploads/`)은 **서버 로컬 디스크**에 씁니다. 이 방식은:
+- ✅ 일반 Node 서버(VPS, Railway, Render, Fly.io, Docker 등 `npm run build && npm start`로 계속 떠있는 서버)에서는 정상 작동하고 재시작해도 유지됩니다.
+- ❌ **Vercel/Netlify 같은 서버리스 배포에서는 파일 쓰기가 요청마다 초기화되거나 읽기 전용이라 댓글·업로드가 저장되지 않습니다.** 서브도메인에 배포할 계획이라면 서버리스가 아닌 방식(예: VPS에 직접 배포하거나 Railway/Render 같은 "항상 켜져 있는" 호스팅)을 쓰세요.
+- 정말 서버리스로 가야 한다면, `data/doc-comments.json`·`public/uploads`를 Supabase(이미 연동 준비돼 있음)나 S3 같은 외부 저장소로 옮기는 작업이 추가로 필요합니다.
+
+### 서브도메인 연결 (예: docs.내도메인.com)
+1. 이 저장소를 GitHub에 push
+2. Railway/Render 등에서 이 저장소를 배포 (Node 앱으로, `npm run build` → `npm start`)
+3. 호스팅 서비스의 "Custom Domain" 설정에서 원하는 서브도메인 입력
+4. 도메인 등록업체(가비아, 후이즈 등) DNS에 안내받은 CNAME 레코드 추가
+5. 전파 후 서브도메인으로 접속하면 끝 (이 부분은 계정 정보가 필요해서 직접 실행은 어렵고, 여기까지 안내만 가능합니다)
+
 ## 색·이미지
 - 그라데이션 없이 단색 + 플랫 SVG 일러스트(`globals.css`의 `.ill-*`)로 카드 커버를 그립니다.
 - 실제 사진을 쓰려면 `.ill-*` 대신 `<img>` 또는 `background-image: url(...)`로 교체하세요.

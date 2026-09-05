@@ -48,6 +48,12 @@ const groups: { label?: string; items: NavItem[] }[] = [
     ],
   },
   {
+    label: "문서",
+    items: [
+      { href: "/docs", label: "기획서", icon: <><path d="M4 4h13v15a2 2 0 002 2H6a2 2 0 01-2-2V4z" /><path d="M7 8h7M7 12h7M7 16h4" /></> },
+    ],
+  },
+  {
     label: "계정",
     items: [
       { href: "/profile", label: "프로필", icon: <><circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0116 0" /></> },
@@ -60,7 +66,7 @@ const crumbMap: Record<string, string> = {
   "/news": "AI 뉴스", "/subscriptions": "구독", "/scrap": "스크랩",
   "/my-courses": "내 수업", "/my-courses/notices": "공지보기", "/my-courses/materials": "자료실",
   "/my-courses/assignments": "과제확인", "/my-courses/schedule": "일정확인",
-  "/programs": "강의목록", "/alumni": "취업정보",
+  "/programs": "강의목록", "/alumni": "취업정보", "/docs": "기획서",
   "/mentors": "멘토링 신청", "/profile": "프로필",
 };
 
