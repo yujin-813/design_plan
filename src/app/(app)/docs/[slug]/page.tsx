@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { docs, getDocContent, getDocHistory } from "@/lib/docs";
-import DocComments from "@/components/DocComments";
+import { annotateHtmlForComments, docs, getDocContent, getDocHistory } from "@/lib/docs";
+import AnnotatableDoc from "@/components/AnnotatableDoc";
 
 export default function DocDetailPage({ params }: { params: { slug: string } }) {
   const meta = docs.find((d) => d.slug === params.slug);
-  const html = getDocContent(params.slug);
-  if (!meta || html === null) notFound();
+  const rawHtml = getDocContent(params.slug);
+  if (!meta || rawHtml === null) notFound();
+  const html = annotateHtmlForComments(rawHtml);
 
   const history = getDocHistory(params.slug);
 
@@ -22,9 +23,7 @@ export default function DocDetailPage({ params }: { params: { slug: string } }) 
         </Link>
       </div>
 
-      <div className="card doc-content" style={{ padding: 32, marginBottom: 22 }} dangerouslySetInnerHTML={{ __html: html }} />
-
-      <DocComments slug={params.slug} />
+      <AnnotatableDoc slug={params.slug} html={html} />
     </>
   );
 }

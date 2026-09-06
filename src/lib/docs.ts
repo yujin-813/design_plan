@@ -16,6 +16,17 @@ export function getDocContent(slug: string): string | null {
   return fs.readFileSync(p, "utf-8");
 }
 
+// 클릭해서 댓글을 달 수 있도록 각 블록 태그에 data-anchor를 미리 심어둡니다.
+// (클라이언트에서 나중에 DOM을 조작하면 리렌더 시 innerHTML이 다시 쓰이며 사라질 수 있어
+//  문자열 단계에서 아예 박아넣는 방식이 안전합니다.)
+export function annotateHtmlForComments(html: string): string {
+  let i = 0;
+  return html.replace(/<(h1|h2|h3|p|li|img)((?:\s+[^>]*)?)>/gi, (_m, tag, attrs) => {
+    const anchor = `b${i++}`;
+    return `<${tag}${attrs} data-anchor="${anchor}" class="commentable">`;
+  });
+}
+
 export type DocRevision = { hash: string; date: string; message: string };
 
 export function getDocHistory(slug: string): DocRevision[] {
