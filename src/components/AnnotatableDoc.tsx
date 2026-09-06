@@ -22,10 +22,15 @@ function formatAt(iso: string) {
 }
 
 export default function AnnotatableDoc({ slug, html }: { slug: string; html: string }) {
+  const wrapRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const popoverRef = useRef<HTMLDivElement>(null);
+
   const [comments, setComments] = useState<DocComment[]>([]);
-  const [selectedAnchor, setSelectedAnchor] = useState<string | null>(null);
-  const [selectedPreview, setSelectedPreview] = useState<string | null>(null);
+  const [openAnchor, setOpenAnchor] = useState<string | null>(null);
+  const [openPreview, setOpenPreview] = useState<string | null>(null);
+  const [popoverPos, setPopoverPos] = useState<{ top: number; left: number } | null>(null);
+
   const [draft, setDraft] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editDraft, setEditDraft] = useState("");
@@ -42,6 +47,7 @@ export default function AnnotatableDoc({ slug, html }: { slug: string; html: str
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug]);
 
+  // 댓글 개수 배지 + 활성 강조 표시
   useEffect(() => {
     const root = contentRef.current;
     if (!root) return;
@@ -55,23 +61,66 @@ export default function AnnotatableDoc({ slug, html }: { slug: string; html: str
       const n = counts.get(a) || 0;
       if (n > 0) el.dataset.count = String(n);
       else delete el.dataset.count;
-      el.classList.toggle("active", a === selectedAnchor);
+      el.classList.toggle("active", a === openAnchor);
     });
-  }, [comments, selectedAnchor, html]);
+  }, [comments, openAnchor, html]);
+
+  function closePopover() {
+    setOpenAnchor(null);
+    setOpenPreview(null);
+    setPopoverPos(null);
+    setDraft("");
+    setEditingId(null);
+    setReplyingId(null);
+  }
 
   function onContentClick(e: React.MouseEvent) {
     const target = (e.target as HTMLElement).closest("[data-anchor]") as HTMLElement | null;
     if (!target || !contentRef.current?.contains(target)) return;
     const anchor = target.dataset.anchor!;
+
+    if (openAnchor === anchor) {
+      closePopover();
+      return;
+    }
+
     const preview = (target.tagName === "IMG" ? (target as HTMLImageElement).alt : target.textContent || "").slice(0, 60);
-    setSelectedAnchor(anchor);
-    setSelectedPreview(preview);
+    const wrap = wrapRef.current;
+    if (!wrap) return;
+
+    const top = target.offsetTop + target.offsetHeight + 8;
+    const maxLeft = Math.max(0, wrap.clientWidth - 360);
+    const left = Math.min(target.offsetLeft, maxLeft);
+
+    setOpenAnchor(anchor);
+    setOpenPreview(preview);
+    setPopoverPos({ top, left });
+    setDraft("");
+    setEditingId(null);
+    setReplyingId(null);
   }
 
-  const visibleComments = useMemo(() => {
-    const top = comments.filter((c) => !c.parentId && (selectedAnchor === null ? true : c.anchor === selectedAnchor));
+  // 팝오버 바깥 클릭하면 닫기
+  useEffect(() => {
+    if (!openAnchor) return;
+    function onDocMouseDown(e: MouseEvent) {
+      const pop = popoverRef.current;
+      if (pop && pop.contains(e.target as Node)) return;
+      const target = (e.target as HTMLElement).closest?.("[data-anchor]");
+      if (target && target instanceof HTMLElement && target.dataset.anchor === openAnchor) return;
+      closePopover();
+    }
+    document.addEventListener("mousedown", onDocMouseDown);
+    return () => document.removeEventListener("mousedown", onDocMouseDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [openAnchor]);
+
+  const anchorComments = useMemo(() => {
+    const top = comments.filter((c) => c.anchor === openAnchor && !c.parentId);
     return top.map((c) => ({ ...c, replies: comments.filter((r) => r.parentId === c.id) }));
-  }, [comments, selectedAnchor]);
+  }, [comments, openAnchor]);
+
+  const allTopComments = useMemo(() => comments.filter((c) => !c.parentId), [comments]);
 
   async function post(body: Record<string, unknown>) {
     const res = await fetch("/api/doc-comments", {
@@ -86,14 +135,14 @@ export default function AnnotatableDoc({ slug, html }: { slug: string; html: str
   async function submitNew(e: React.FormEvent) {
     e.preventDefault();
     const text = draft.trim();
-    if (!text) return;
-    if (await post({ text, anchor: selectedAnchor, anchorPreview: selectedPreview, parentId: null })) setDraft("");
+    if (!text || !openAnchor) return;
+    if (await post({ text, anchor: openAnchor, anchorPreview: openPreview, parentId: null })) setDraft("");
   }
 
   async function submitReply(parentId: string) {
     const text = replyDraft.trim();
     if (!text) return;
-    if (await post({ text, anchor: selectedAnchor, anchorPreview: selectedPreview, parentId })) {
+    if (await post({ text, anchor: openAnchor, anchorPreview: openPreview, parentId })) {
       setReplyDraft("");
       setReplyingId(null);
     }
@@ -166,76 +215,92 @@ export default function AnnotatableDoc({ slug, html }: { slug: string; html: str
 
   return (
     <>
-      <div
-        ref={contentRef}
-        className="card doc-content"
-        style={{ padding: 32, marginBottom: 22 }}
-        onClick={onContentClick}
-        dangerouslySetInnerHTML={{ __html: html }}
-      />
+      <div ref={wrapRef} style={{ position: "relative" }}>
+        <div
+          ref={contentRef}
+          className="card doc-content"
+          style={{ padding: 32, marginBottom: 22 }}
+          onClick={onContentClick}
+          dangerouslySetInnerHTML={{ __html: html }}
+        />
+
+        {openAnchor && popoverPos && (
+          <div ref={popoverRef} className="doc-popover" style={{ top: popoverPos.top, left: popoverPos.left }}>
+            <div className="doc-popover-head">
+              <span>&ldquo;{openPreview}&hellip;&rdquo; 부분</span>
+              <button onClick={closePopover} aria-label="닫기">✕</button>
+            </div>
+
+            {anchorComments.length === 0 && <p className="doc-popover-empty">아직 댓글이 없어요. 첫 댓글을 남겨보세요!</p>}
+
+            {anchorComments.map((c) => (
+              <div key={c.id}>
+                <CommentRow c={c} />
+                {c.replies.map((r) => (
+                  <CommentRow c={r} isReply key={r.id} />
+                ))}
+                {replyingId === c.id && (
+                  <form
+                    className="cmt-replyform reply"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      submitReply(c.id);
+                    }}
+                  >
+                    <input value={replyDraft} onChange={(e) => setReplyDraft(e.target.value)} placeholder="답글 남기기…" autoFocus />
+                    <button className="btn sm v" type="submit">등록</button>
+                  </form>
+                )}
+              </div>
+            ))}
+
+            <form onSubmit={submitNew} className="doc-popover-form">
+              <input
+                value={draft}
+                onChange={(e) => setDraft(e.target.value)}
+                placeholder="이 부분에 댓글 남기기…"
+                autoFocus
+              />
+              <button className="btn sm v" type="submit">저장</button>
+            </form>
+          </div>
+        )}
+      </div>
 
       <div className="card" style={{ padding: 20 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8, flexWrap: "wrap", gap: 8 }}>
-          <h3 style={{ fontSize: 15, fontWeight: 800, margin: 0 }}>
-            댓글 {comments.filter((c) => !c.parentId).length}
-            {selectedAnchor && <span style={{ fontWeight: 500, color: "var(--muted)", fontSize: 12.5 }}> · &ldquo;{selectedPreview}&hellip;&rdquo; 부분</span>}
-          </h3>
-          {selectedAnchor && (
-            <button
-              className="more"
-              onClick={() => {
-                setSelectedAnchor(null);
-                setSelectedPreview(null);
-              }}
-            >
-              전체 댓글 보기
-            </button>
-          )}
-        </div>
+        <h3 style={{ fontSize: 15, fontWeight: 800, margin: "0 0 8px" }}>전체 댓글 {allTopComments.length}</h3>
+        <p style={{ margin: "0 0 14px", fontSize: 12.5, color: "var(--faint)" }}>
+          💡 문서 안의 문장이나 이미지를 클릭하면 그 부분에 댓글 쓰는 창이 열려요. 같은 곳을 다시 누르면 닫혀요.
+        </p>
 
-        {!selectedAnchor && (
-          <p style={{ margin: "0 0 14px", fontSize: 12.5, color: "var(--faint)" }}>
-            💡 문서 안의 문장이나 이미지를 클릭하면 그 부분에 댓글을 남길 수 있어요.
-          </p>
-        )}
+        {allTopComments.length === 0 && <p style={{ margin: 0, fontSize: 13, color: "var(--faint)" }}>아직 댓글이 없어요.</p>}
 
-        {visibleComments.length === 0 && (
-          <p style={{ margin: "0 0 14px", fontSize: 13, color: "var(--faint)" }}>아직 댓글이 없어요. 첫 댓글을 남겨보세요!</p>
-        )}
-
-        {visibleComments.map((c) => (
+        {allTopComments.map((c) => (
           <div key={c.id} style={{ marginBottom: 4 }}>
-            {!selectedAnchor && c.anchorPreview && (
-              <div style={{ fontSize: 11.5, color: "var(--violet-ink)", marginTop: 10 }}>&ldquo;{c.anchorPreview}&hellip;&rdquo; 부분</div>
-            )}
-            <CommentRow c={c} />
-            {c.replies.map((r) => (
-              <CommentRow c={r} isReply key={r.id} />
-            ))}
-            {replyingId === c.id && (
-              <form
-                className="cmt-replyform reply"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  submitReply(c.id);
-                }}
-              >
-                <input value={replyDraft} onChange={(e) => setReplyDraft(e.target.value)} placeholder="답글 남기기…" autoFocus />
-                <button className="btn sm v" type="submit">등록</button>
-              </form>
-            )}
+            {c.anchorPreview && <div style={{ fontSize: 11.5, color: "var(--violet-ink)", marginTop: 10 }}>&ldquo;{c.anchorPreview}&hellip;&rdquo; 부분</div>}
+            <div className="cmt">
+              <div className="row">
+                <b>{c.author}</b>
+                <span className="txt">
+                  {c.text}
+                  {c.editedAt && <span style={{ color: "var(--faint)" }}> (수정됨)</span>}
+                </span>
+                <span className="at">{formatAt(c.at)}</span>
+              </div>
+            </div>
+            {comments
+              .filter((r) => r.parentId === c.id)
+              .map((r) => (
+                <div className="cmt reply" key={r.id}>
+                  <div className="row">
+                    <b>{r.author}</b>
+                    <span className="txt">{r.text}</span>
+                    <span className="at">{formatAt(r.at)}</span>
+                  </div>
+                </div>
+              ))}
           </div>
         ))}
-
-        <form onSubmit={submitNew} style={{ display: "flex", gap: 8, marginTop: 16 }}>
-          <input
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            placeholder={selectedAnchor ? "이 부분에 댓글 남기기…" : "댓글을 남겨보세요…"}
-            style={{ flex: 1, padding: "10px 13px", border: "1px solid var(--border-2)", borderRadius: 10, background: "var(--surface)", color: "var(--ink)", font: "inherit", fontSize: 13, outline: "none" }}
-          />
-          <button className="btn v" type="submit">등록</button>
-        </form>
       </div>
     </>
   );
