@@ -58,12 +58,14 @@ const groups: { label?: string; items: NavItem[] }[] = [
       { href: "/mentors", label: "멘토링 신청", icon: <><circle cx="9" cy="8" r="3" /><path d="M3 20a6 6 0 0112 0M17 11l2 2 4-4" /></> },
     ],
   },
-  {
-    label: "문서",
-    items: [
-      { href: "/docs", label: "기획서", icon: <><path d="M4 4h13v15a2 2 0 002 2H6a2 2 0 01-2-2V4z" /><path d="M7 8h7M7 12h7M7 16h4" /></> },
-    ],
-  },
+  // 기획서(문서) 메뉴는 잠깐 숨겨둡니다. /docs 주소로는 그대로 접근할 수 있고,
+  // 다시 보이게 하려면 아래 주석을 풀면 됩니다.
+  // {
+  //   label: "문서",
+  //   items: [
+  //     { href: "/docs", label: "기획서", icon: docsIcon },
+  //   ],
+  // },
   {
     label: "계정",
     items: [
