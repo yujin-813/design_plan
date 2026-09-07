@@ -3,6 +3,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import Logo from "./Logo";
+import { REQUIRE_LOGIN } from "@/lib/auth";
 
 type Profile = { name: string; cohort: string; role: string; signedIn?: boolean };
 type NavChild = { href: string; label: string };
@@ -87,7 +88,8 @@ export default function AppShell({ profile, children }: { profile: Profile; chil
   const [manualOpen, setManualOpen] = useState<Record<string, boolean>>({});
   const crumb = crumbMap[pathname] ?? "";
   const initial = (profile.name || "?").slice(0, 2);
-  const navGroups = profile.signedIn ? groups : guestGroups;
+  const showFullMenu = !REQUIRE_LOGIN || profile.signedIn;
+  const navGroups = showFullMenu ? groups : guestGroups;
 
   function toggleTheme() {
     const root = document.documentElement;
@@ -165,8 +167,8 @@ export default function AppShell({ profile, children }: { profile: Profile; chil
         </nav>
         <div className="su">
           <div className="av">{initial}</div>
-          <div className="nm"><b>{profile.name}</b><small>{profile.cohort} · {profile.signedIn ? "멤버" : "게스트"}</small></div>
-          {profile.signedIn && (
+          <div className="nm"><b>{profile.name}</b><small>{profile.cohort} · {showFullMenu ? "멤버" : "게스트"}</small></div>
+          {REQUIRE_LOGIN && profile.signedIn && (
             <button onClick={logout} title="로그아웃">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">{logoutIcon}</svg>
             </button>
@@ -187,7 +189,7 @@ export default function AppShell({ profile, children }: { profile: Profile; chil
             <svg width="16" height="16" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" /><path d="M21 21l-4-4" /></svg>
             <input placeholder="검색…" />
           </div>
-          {profile.signedIn ? (
+          {showFullMenu ? (
             <Link className="btn v" href="/community"><svg className="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>새 글</Link>
           ) : (
             <Link className="btn v" href="/login"><svg className="ico" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" /><path d="M10 17l5-5-5-5M15 12H3" /></svg>로그인</Link>

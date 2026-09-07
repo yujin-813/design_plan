@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { SESSION_COOKIE } from "@/lib/auth";
+import { REQUIRE_LOGIN, SESSION_COOKIE } from "@/lib/auth";
 
 // 로그인하지 않은 방문자는 기획서·로그인 화면만 볼 수 있고,
 // test@test.com / test123 으로 로그인해야 나머지 대시보드 메뉴가 열립니다.
@@ -17,6 +17,8 @@ function redirectToDocs(req: NextRequest) {
 }
 
 export function middleware(req: NextRequest) {
+  if (!REQUIRE_LOGIN) return NextResponse.next();
+
   const { pathname } = req.nextUrl;
   const signedIn = req.cookies.get(SESSION_COOKIE)?.value === "1";
 
