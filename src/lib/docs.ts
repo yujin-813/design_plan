@@ -3,7 +3,7 @@ import path from "path";
 import { execFileSync } from "child_process";
 
 export const docs = [
-  { slug: "arki-spec", title: "아르키 기획서", desc: "전체 페이지 구조와 기능을 정리한 서비스 기획 문서" },
+  { slug: "arki-spec", title: "이음 기획서", desc: "전체 페이지 구조와 기능을 정리한 서비스 기획 문서" },
 ];
 
 function docPath(slug: string) {

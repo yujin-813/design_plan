@@ -111,7 +111,7 @@ export default function AppShell({ profile, children }: { profile: Profile; chil
       <div className="scrim" onClick={() => setOpen(false)} />
       <aside className="sidebar">
         <div className="brand">
-          <Logo /><b>아르키</b>
+          <Logo /><b>이음</b>
         </div>
         <nav className="navwrap">
           {navGroups.map((g, gi) => (
@@ -186,7 +186,7 @@ export default function AppShell({ profile, children }: { profile: Profile; chil
           <button className="burger" onClick={() => setOpen((v) => !v)}>
             <svg className="ico" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18" /></svg>
           </button>
-          <div className="crumb">아르키 › <b>{crumb}</b></div>
+          <div className="crumb">이음 › <b>{crumb}</b></div>
           <div className="search">
             <svg width="16" height="16" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" /><path d="M21 21l-4-4" /></svg>
             <input placeholder="검색…" />

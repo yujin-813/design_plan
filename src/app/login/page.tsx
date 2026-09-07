@@ -37,7 +37,7 @@ export default function LoginPage() {
         <form className="card authcard" onSubmit={onSubmit}>
           <Logo size={46} />
           <h1 style={{ marginTop: 18 }}>다시 오신 걸 환영해요</h1>
-          <p className="sub">아르키에 로그인하세요.</p>
+          <p className="sub">이음에 로그인하세요.</p>
           {err && <div className="err">{err}</div>}
           <div className="field">
             <label>이메일</label>

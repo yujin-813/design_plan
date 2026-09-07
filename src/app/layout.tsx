@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "아르키",
+  title: "이음",
   description: "AI 마케팅 교육 수료생 커뮤니티",
 };
 

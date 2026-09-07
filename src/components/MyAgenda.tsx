@@ -33,7 +33,7 @@ export default function MyAgenda() {
   if (items.length === 0) {
     return (
       <div>
-        <span className="eyebrow">오늘의 아르키</span>
+        <span className="eyebrow">오늘의 이음</span>
         <h2 style={{ marginTop: 8 }}>아직 챙길 일정이 없어요</h2>
         <p>관심있는 이벤트나 수업을 담아두면 여기 모아서 보여드려요.</p>
         <div className="qchips" style={{ marginTop: 12 }}>
@@ -46,7 +46,7 @@ export default function MyAgenda() {
 
   return (
     <div>
-      <span className="eyebrow">오늘의 아르키 · 내가 구독한 것</span>
+      <span className="eyebrow">오늘의 이음 · 내가 구독한 것</span>
       <h2 style={{ marginTop: 8 }}>챙겨야 할 일정이 {items.length}개 있어요</h2>
       <div className="qchips" style={{ marginTop: 14 }}>
         {items.map((it) => (
