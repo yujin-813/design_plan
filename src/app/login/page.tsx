@@ -1,8 +1,6 @@
 "use client";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { createClient, supabaseEnabled } from "@/lib/supabase/client";
 import Logo from "@/components/Logo";
 import AuthBrandPanel from "@/components/AuthBrandPanel";
 
@@ -16,16 +14,18 @@ export default function LoginPage() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setErr("");
-    const supabase = createClient();
-    if (!supabase) {
-      // 데모 모드: Supabase 미설정 → 바로 홈으로
-      router.push("/");
+    setLoading(true);
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password: pw }),
+    });
+    setLoading(false);
+    if (!res.ok) {
+      const data = await res.json().catch(() => null);
+      setErr(data?.error || "로그인에 실패했어요.");
       return;
     }
-    setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password: pw });
-    setLoading(false);
-    if (error) return setErr(error.message);
     router.push("/");
     router.refresh();
   }
@@ -50,12 +50,6 @@ export default function LoginPage() {
           <button className="btn v" style={{ width: "100%" }} disabled={loading}>
             {loading ? "로그인 중…" : "로그인"}
           </button>
-          <p className="note">
-            계정이 없으신가요? <Link href="/signup" style={{ color: "var(--violet-ink)", fontWeight: 600 }}>회원가입</Link>
-          </p>
-          {!supabaseEnabled && (
-            <span className="demopill">데모 모드 · 아무 값이나 입력하고 로그인하면 홈으로 이동해요.</span>
-          )}
         </form>
       </div>
     </div>

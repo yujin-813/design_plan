@@ -1,5 +1,7 @@
+import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { seed } from "@/lib/seed";
+import { SESSION_COOKIE } from "@/lib/auth";
 
 export type PostView = {
   id: number | string;
@@ -27,6 +29,8 @@ function ago(iso: string): string {
 
 // 로그인한 사용자의 표시 이름/기수 (없으면 시드)
 export async function getProfile() {
+  if (cookies().get(SESSION_COOKIE)?.value === "1") return { ...seed.me, signedIn: true };
+
   const supabase = createClient();
   if (!supabase) return { ...seed.me, signedIn: false };
   const { data: auth } = await supabase.auth.getUser();

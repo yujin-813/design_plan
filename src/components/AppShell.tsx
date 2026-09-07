@@ -1,12 +1,22 @@
 "use client";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import Logo from "./Logo";
 
 type Profile = { name: string; cohort: string; role: string; signedIn?: boolean };
 type NavChild = { href: string; label: string };
 type NavItem = { href: string; label: string; icon: JSX.Element; badge?: string; isNew?: boolean; children?: NavChild[] };
+
+const docsIcon = <><path d="M4 4h13v15a2 2 0 002 2H6a2 2 0 01-2-2V4z" /><path d="M7 8h7M7 12h7M7 16h4" /></>;
+const loginIcon = <><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" /><path d="M10 17l5-5-5-5M15 12H3" /></>;
+const logoutIcon = <><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" /><path d="M16 17l5-5-5-5M21 12H9" /></>;
+
+// 로그인하지 않은 방문자에게 보이는 메뉴: 기획서 + 로그인 뿐입니다.
+const guestGroups: { label?: string; items: NavItem[] }[] = [
+  { label: "문서", items: [{ href: "/docs", label: "기획서", icon: docsIcon }] },
+  { label: "계정", items: [{ href: "/login", label: "로그인", icon: loginIcon }] },
+];
 
 const groups: { label?: string; items: NavItem[] }[] = [
   {
@@ -72,16 +82,24 @@ const crumbMap: Record<string, string> = {
 
 export default function AppShell({ profile, children }: { profile: Profile; children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [manualOpen, setManualOpen] = useState<Record<string, boolean>>({});
   const crumb = crumbMap[pathname] ?? "";
   const initial = (profile.name || "?").slice(0, 2);
+  const navGroups = profile.signedIn ? groups : guestGroups;
 
   function toggleTheme() {
     const root = document.documentElement;
     const next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
     root.setAttribute("data-theme", next);
     try { localStorage.setItem("arki-theme", next); } catch { /* ignore */ }
+  }
+
+  async function logout() {
+    await fetch("/api/auth/logout", { method: "POST" });
+    router.push("/docs/arki-spec");
+    router.refresh();
   }
 
   return (
@@ -92,7 +110,7 @@ export default function AppShell({ profile, children }: { profile: Profile; chil
           <Logo /><b>아르키</b>
         </div>
         <nav className="navwrap">
-          {groups.map((g, gi) => (
+          {navGroups.map((g, gi) => (
             <div key={gi}>
               {g.label && <div className="glabel">{g.label}</div>}
               {g.items.map((it) => {
@@ -148,6 +166,11 @@ export default function AppShell({ profile, children }: { profile: Profile; chil
         <div className="su">
           <div className="av">{initial}</div>
           <div className="nm"><b>{profile.name}</b><small>{profile.cohort} · {profile.signedIn ? "멤버" : "게스트"}</small></div>
+          {profile.signedIn && (
+            <button onClick={logout} title="로그아웃">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">{logoutIcon}</svg>
+            </button>
+          )}
           <button onClick={toggleTheme} title="테마">
             <svg width="16" height="16" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1111.2 3 7 7 0 0021 12.8z" /></svg>
           </button>
@@ -164,7 +187,11 @@ export default function AppShell({ profile, children }: { profile: Profile; chil
             <svg width="16" height="16" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" /><path d="M21 21l-4-4" /></svg>
             <input placeholder="검색…" />
           </div>
-          <Link className="btn v" href="/community"><svg className="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>새 글</Link>
+          {profile.signedIn ? (
+            <Link className="btn v" href="/community"><svg className="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>새 글</Link>
+          ) : (
+            <Link className="btn v" href="/login"><svg className="ico" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" /><path d="M10 17l5-5-5-5M15 12H3" /></svg>로그인</Link>
+          )}
         </div>
         <div className="content">{children}</div>
       </div>
