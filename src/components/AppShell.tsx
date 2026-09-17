@@ -3,9 +3,9 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import Logo from "./Logo";
-import { REQUIRE_LOGIN } from "@/lib/auth";
+import { REQUIRE_LOGIN } from "@/lib/session";
 
-type Profile = { name: string; cohort: string; role: string; signedIn?: boolean };
+type Profile = { name: string; cohort: string; role: string; status?: string; signedIn?: boolean };
 type NavChild = { href: string; label: string };
 type NavItem = { href: string; label: string; icon: JSX.Element; badge?: string; isNew?: boolean; children?: NavChild[] };
 
@@ -13,10 +13,16 @@ const docsIcon = <><path d="M4 4h13v15a2 2 0 002 2H6a2 2 0 01-2-2V4z" /><path d=
 const loginIcon = <><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" /><path d="M10 17l5-5-5-5M15 12H3" /></>;
 const logoutIcon = <><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" /><path d="M16 17l5-5-5-5M21 12H9" /></>;
 
-// 로그인하지 않은 방문자에게 보이는 메뉴: 기획서 + 로그인 뿐입니다.
+const adminIcon = <><path d="M12 3l8 4v5c0 4.4-3.2 7.9-8 9-4.8-1.1-8-4.6-8-9V7z" /><path d="M9 12l2 2 4-4" /></>;
+
+// 승인 전 수강생·비로그인 방문자에게 보이는 메뉴
 const guestGroups: { label?: string; items: NavItem[] }[] = [
-  { label: "문서", items: [{ href: "/docs", label: "기획서", icon: docsIcon }] },
   { label: "계정", items: [{ href: "/login", label: "로그인", icon: loginIcon }] },
+];
+
+// 운영자 메뉴
+const adminGroups: { label?: string; items: NavItem[] }[] = [
+  { label: "운영", items: [{ href: "/admin/members", label: "가입자 관리", icon: adminIcon }] },
 ];
 
 const groups: { label?: string; items: NavItem[] }[] = [
@@ -80,18 +86,42 @@ const crumbMap: Record<string, string> = {
   "/my-courses": "내 수업", "/my-courses/notices": "공지보기", "/my-courses/materials": "자료실",
   "/my-courses/assignments": "과제확인", "/my-courses/schedule": "일정확인",
   "/programs": "강의목록", "/alumni": "취업정보", "/docs": "기획서",
-  "/mentors": "멘토링 신청", "/profile": "프로필",
+  "/mentors": "멘토링 신청", "/profile": "프로필", "/admin/members": "가입자 관리",
 };
 
-export default function AppShell({ profile, children }: { profile: Profile; children: React.ReactNode }) {
+export default function AppShell({
+  profile,
+  pendingCount = 0,
+  children,
+}: {
+  profile: Profile;
+  pendingCount?: number;
+  children: React.ReactNode;
+}) {
   const pathname = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [manualOpen, setManualOpen] = useState<Record<string, boolean>>({});
   const crumb = crumbMap[pathname] ?? "";
   const initial = (profile.name || "?").slice(0, 2);
-  const showFullMenu = !REQUIRE_LOGIN || profile.signedIn;
-  const navGroups = showFullMenu ? groups : guestGroups;
+
+  const isAdmin = profile.role === "admin";
+  // 승인받은 수강생·운영자에게만 과정 메뉴를 보여줍니다.
+  const approved = !REQUIRE_LOGIN || (profile.signedIn && profile.status === "approved");
+
+  const navGroups = isAdmin
+    ? [
+        ...adminGroups.map((g) => ({
+          ...g,
+          items: g.items.map((it) =>
+            it.href === "/admin/members" && pendingCount > 0 ? { ...it, badge: String(pendingCount) } : it
+          ),
+        })),
+        ...groups,
+      ]
+    : approved
+      ? groups
+      : guestGroups;
 
   function toggleTheme() {
     const root = document.documentElement;
@@ -102,7 +132,7 @@ export default function AppShell({ profile, children }: { profile: Profile; chil
 
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/docs/arki-spec");
+    router.push("/login");
     router.refresh();
   }
 
@@ -169,7 +199,13 @@ export default function AppShell({ profile, children }: { profile: Profile; chil
         </nav>
         <div className="su">
           <div className="av">{initial}</div>
-          <div className="nm"><b>{profile.name}</b><small>{profile.cohort} · {showFullMenu ? "멤버" : "게스트"}</small></div>
+          <div className="nm">
+            <b>{profile.name}</b>
+            <small>
+              {profile.cohort}
+              {isAdmin ? "" : profile.signedIn ? (approved ? " · 수강생" : " · 승인 대기") : " · 게스트"}
+            </small>
+          </div>
           {REQUIRE_LOGIN && profile.signedIn && (
             <button onClick={logout} title="로그아웃">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">{logoutIcon}</svg>
@@ -191,11 +227,16 @@ export default function AppShell({ profile, children }: { profile: Profile; chil
             <svg width="16" height="16" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" /><path d="M21 21l-4-4" /></svg>
             <input placeholder="검색…" />
           </div>
-          {showFullMenu ? (
+          {isAdmin ? (
+            <Link className="btn v" href="/admin/members">
+              <svg className="ico" viewBox="0 0 24 24">{adminIcon}</svg>
+              가입자 관리{pendingCount > 0 ? ` (${pendingCount})` : ""}
+            </Link>
+          ) : approved ? (
             <Link className="btn v" href="/community"><svg className="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>새 글</Link>
-          ) : (
-            <Link className="btn v" href="/login"><svg className="ico" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" /><path d="M10 17l5-5-5-5M15 12H3" /></svg>로그인</Link>
-          )}
+          ) : !profile.signedIn ? (
+            <Link className="btn v" href="/login"><svg className="ico" viewBox="0 0 24 24">{loginIcon}</svg>로그인</Link>
+          ) : null}
         </div>
         <div className="content">{children}</div>
       </div>

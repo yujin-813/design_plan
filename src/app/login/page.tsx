@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Logo from "@/components/Logo";
@@ -26,7 +27,8 @@ export default function LoginPage() {
       setErr(data?.error || "로그인에 실패했어요.");
       return;
     }
-    router.push("/");
+    const data = await res.json().catch(() => null);
+    router.push(data?.role === "admin" ? "/admin/members" : "/");
     router.refresh();
   }
 
@@ -50,6 +52,9 @@ export default function LoginPage() {
           <button className="btn v" style={{ width: "100%" }} disabled={loading}>
             {loading ? "로그인 중…" : "로그인"}
           </button>
+          <p className="note">
+            아직 계정이 없으신가요? <Link href="/signup" style={{ color: "var(--violet-ink)", fontWeight: 600 }}>수강생 가입</Link>
+          </p>
         </form>
       </div>
     </div>
