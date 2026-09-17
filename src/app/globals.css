@@ -338,3 +338,5 @@ svg{stroke:currentColor;fill:none;stroke-width:1.7}
 .cur-week-note{display:block;color:var(--warm-ink);font-size:11px;margin-top:3px}
 @media (max-width:1000px){.cur-weeks{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:700px){.cur-weeks{grid-template-columns:1fr}.cur-cal .dsub{display:none}}
+.mrow-del{color:var(--danger);border-color:var(--border-2)}
+.mrow-del:hover{border-color:var(--danger)}

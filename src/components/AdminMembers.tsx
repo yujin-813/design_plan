@@ -43,6 +43,17 @@ export default function AdminMembers({
     [members, tab]
   );
 
+  async function remove(id: string, name: string) {
+    if (!window.confirm(`${name}님의 가입 정보를 완전히 삭제할까요? 되돌릴 수 없습니다.`)) return;
+    setBusy(id);
+    const res = await fetch(`/api/admin/members?id=${encodeURIComponent(id)}`, { method: "DELETE" });
+    setBusy(null);
+    if (!res.ok) return;
+    const data = await res.json();
+    setMembers((list) => list.filter((m) => m.id !== id));
+    setStat(data.counts);
+  }
+
   async function decide(id: string, status: "approved" | "rejected" | "pending") {
     setBusy(id);
     const res = await fetch("/api/admin/members", {
@@ -135,6 +146,9 @@ export default function AdminMembers({
                   승인 취소
                 </button>
               )}
+              <button className="btn sm mrow-del" disabled={busy === m.id} onClick={() => remove(m.id, m.name)}>
+                삭제
+              </button>
             </div>
           </div>
         ))}
