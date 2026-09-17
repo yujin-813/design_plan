@@ -1,22 +1,17 @@
+// 사이드바·작은 자리에 쓰는 알테라 심볼. BrandWordmark와 같은 스티커 스타일입니다.
 export default function Logo({ size = 38 }: { size?: number }) {
   return (
-    <div
-      style={{
-        width: size,
-        height: size,
-        borderRadius: size * 0.29,
-        background: "var(--violet)",
-        display: "grid",
-        placeItems: "center",
-        flex: "none",
-      }}
+    <svg
+      className="wm-svg"
+      width={size}
+      height={size}
+      viewBox="0 0 64 64"
+      role="img"
+      aria-label="알테라"
+      style={{ flex: "none" }}
     >
-      <svg width={size * 0.58} height={size * 0.58} viewBox="0 0 24 24" fill="none">
-        <path d="M4 5h16v11H9l-5 4V5z" stroke="#fff" strokeWidth="2" strokeLinejoin="round" />
-        <circle cx="9" cy="10.5" r="1" fill="#fff" />
-        <circle cx="12.5" cy="10.5" r="1" fill="#fff" />
-        <circle cx="16" cy="10.5" r="1" fill="#fff" />
-      </svg>
-    </div>
+      <rect className="wm-mark" x="5" y="5" width="54" height="54" rx="19" />
+      <text className="wm wm-mark-letter" x="32" y="47" textAnchor="middle">a</text>
+    </svg>
   );
 }

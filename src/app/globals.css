@@ -268,3 +268,15 @@ svg{stroke:currentColor;fill:none;stroke-width:1.7}
 .ill-news{background:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMjAgMTgwIj48cmVjdCB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCIgZmlsbD0iI0U3RjFGQyIvPjxyZWN0IHg9Ijk2IiB5PSI1MCIgd2lkdGg9IjEyOCIgaGVpZ2h0PSI4MCIgcng9IjgiIGZpbGw9IiNmZmYiIHN0cm9rZT0iIzVCQTZFOCIgc3Ryb2tlLXdpZHRoPSI0Ii8+PHJlY3QgeD0iMTA4IiB5PSI2NCIgd2lkdGg9IjQ2IiBoZWlnaHQ9IjM0IiByeD0iNCIgZmlsbD0iI0I5RDlGNSIvPjxyZWN0IHg9IjE2MiIgeT0iNjQiIHdpZHRoPSI1MCIgaGVpZ2h0PSI3IiByeD0iMyIgZmlsbD0iIzVCQTZFOCIvPjxyZWN0IHg9IjE2MiIgeT0iODAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI3IiByeD0iMyIgZmlsbD0iI0I5RDlGNSIvPjxyZWN0IHg9IjEwOCIgeT0iMTA4IiB3aWR0aD0iMTA0IiBoZWlnaHQ9IjciIHJ4PSIzIiBmaWxsPSIjQjlEOUY1Ii8+PC9zdmc+") center/cover no-repeat}
 .ill-mentor{background:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMjAgMTgwIj48cmVjdCB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCIgZmlsbD0iI0VERTlGQiIvPjxjaXJjbGUgY3g9IjE2MCIgY3k9Ijc0IiByPSIyNiIgZmlsbD0iIzhDNzJFRSIvPjxwYXRoIGQ9Ik0xMTggMTQwIGE0MiA0MiAwIDAgMSA4NCAwIHoiIGZpbGw9IiM2QTQ3RTAiLz48cGF0aCBkPSJNMjM1IDY2IGw1IDExIDExIDUgLTExIDUgLTUgMTEgLTUgLTExIC0xMSAtNSAxMSAtNXoiIGZpbGw9IiNGMDk5NkUiLz48L3N2Zz4=") center/cover no-repeat}
 .ill-event{background:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMjAgMTgwIj48cmVjdCB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCIgZmlsbD0iI0ZDRUVFNiIvPjxyZWN0IHg9IjE0NiIgeT0iNDgiIHdpZHRoPSIyOCIgaGVpZ2h0PSI1MiIgcng9IjE0IiBmaWxsPSIjRjA5OTZFIi8+PHBhdGggZD0iTTEzMiA5MiBhMjggMjggMCAwIDAgNTYgMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNkE0N0UwIiBzdHJva2Utd2lkdGg9IjYiLz48cmVjdCB4PSIxNTYiIHk9IjEwMCIgd2lkdGg9IjgiIGhlaWdodD0iMjIiIGZpbGw9IiM2QTQ3RTAiLz48cmVjdCB4PSIxNDAiIHk9IjEyMiIgd2lkdGg9IjQwIiBoZWlnaHQ9IjgiIHJ4PSI0IiBmaWxsPSIjNkE0N0UwIi8+PC9zdmc+") center/cover no-repeat}
+
+/* ── 알테라 스티커 로고 ───────────────────────────── */
+:root{--brand-line:#15503C;--brand-face:#CFE9DA}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--brand-line:#0B2A20;--brand-face:#7FC7AE}}
+:root[data-theme="dark"]{--brand-line:#0B2A20;--brand-face:#7FC7AE}
+.wm-svg{overflow:visible;display:block}
+.wm{font-family:"Baloo 2","Pretendard",sans-serif;font-weight:800;font-size:104px;letter-spacing:-.01em;stroke-linejoin:round;paint-order:stroke}
+.wm-back{fill:var(--brand-line);stroke:var(--brand-line);stroke-width:34px}
+.wm-face{fill:var(--brand-face);stroke:var(--brand-line);stroke-width:13px}
+.wm-badge{stroke:var(--brand-line);stroke-width:6px}
+.wm-mark{fill:var(--brand-face);stroke:var(--brand-line);stroke-width:7px}
+.wm-mark-letter{font-size:42px;fill:var(--brand-line);stroke:none}

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "이음",
+  title: "알테라",
   description: "AI 마케팅 교육 수료생 커뮤니티",
 };
 
@@ -24,6 +24,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link
           rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap"
+        />
+        {/* 브랜드 로고용 두툼한 라운드 서체 */}
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&display=swap"
         />
       </head>
       <body>{children}</body>

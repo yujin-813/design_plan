@@ -1,4 +1,4 @@
-import Logo from "./Logo";
+import BrandWordmark from "./BrandWordmark";
 
 const feats = [
   {
@@ -22,8 +22,7 @@ export default function AuthBrandPanel() {
   return (
     <div className="authbrand">
       <div className="abtop">
-        <Logo />
-        <b>이음</b>
+        <BrandWordmark width={300} />
       </div>
       <h2>AI 마케팅 수료생들이 계속 이어지는 곳</h2>
       <div className="feats">
