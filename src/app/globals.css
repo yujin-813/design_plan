@@ -340,3 +340,12 @@ svg{stroke:currentColor;fill:none;stroke-width:1.7}
 @media (max-width:700px){.cur-weeks{grid-template-columns:1fr}.cur-cal .dsub{display:none}}
 .mrow-del{color:var(--danger);border-color:var(--border-2)}
 .mrow-del:hover{border-color:var(--danger)}
+/* 주말·공휴일 표시 */
+.cur-cal .dc.sat .dnum{color:var(--sky-deep)}
+.cur-cal .dc.sun .dnum{color:var(--danger)}
+.cur-cal .dc.holi .dnum{color:var(--danger)}
+.cur-cal .dc.sat:not(.has),.cur-cal .dc.sun:not(.has){background:color-mix(in srgb,var(--raise) 55%,transparent)}
+.cur-cal .dc.holi:not(.has){background:color-mix(in srgb,var(--danger) 8%,transparent)}
+.cur-cal .dholi{font-size:10px;font-weight:700;color:var(--danger);line-height:1.3}
+.cur-cal .dw:nth-child(6){color:var(--sky-deep)}
+.cur-cal .dw:nth-child(7){color:var(--danger)}

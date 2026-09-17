@@ -40,6 +40,22 @@ export const trackStyle: Record<Track, { color: string; soft: string; label: str
   공통: { color: "var(--mint)", soft: "var(--mint-soft)", label: "공통" },
 };
 
+// 교육 기간에 걸치는 공휴일 (대체공휴일 포함)
+export const holidays: Record<string, string> = {
+  "2026-09-24": "추석 연휴",
+  "2026-09-25": "추석",
+  "2026-09-26": "추석 연휴",
+  "2026-09-27": "추석 연휴",
+  "2026-10-03": "개천절",
+  "2026-10-05": "대체공휴일",
+  "2026-10-09": "한글날",
+  "2026-12-25": "성탄절",
+};
+
+export function holidayName(date: string) {
+  return holidays[date] ?? null;
+}
+
 export type Lesson = {
   date: string; // YYYY-MM-DD
   week: number;

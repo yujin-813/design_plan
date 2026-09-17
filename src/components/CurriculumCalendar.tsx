@@ -1,7 +1,7 @@
 "use client";
 import { useMemo, useState } from "react";
 import { buildMonthGrid, monthLabel } from "@/lib/calendarGrid";
-import { cohorts, lessons, trackStyle, weeks, weekHours, totalHours, type Track } from "@/lib/curriculum";
+import { cohorts, holidayName, lessons, trackStyle, weeks, weekHours, totalHours, type Track } from "@/lib/curriculum";
 
 const DOWS = ["월", "화", "수", "목", "금", "토", "일"];
 
@@ -64,6 +64,7 @@ export default function CurriculumCalendar() {
         {(Object.keys(trackStyle) as Track[]).map((t) => (
           <span key={t}><i style={{ background: trackStyle[t].color }} />{t}</span>
         ))}
+        <span><i style={{ background: "var(--danger)" }} />공휴일</span>
         <span className="cur-legend-sum">이 달 수업 {monthLessons.length}일 · {monthHours}시간</span>
       </div>
 
@@ -73,14 +74,20 @@ export default function CurriculumCalendar() {
           const date = c.inMonth ? ymd(year, month0, c.n) : null;
           const lesson = date ? byDate.get(date) : null;
           const style = lesson ? trackStyle[lesson.track] : null;
+          const holiday = date ? holidayName(date) : null;
+          const dow = i % 7; // 0=월 … 5=토, 6=일
+          const dowCls = dow === 5 ? " sat" : dow === 6 ? " sun" : "";
           return (
             <div
               key={i}
-              className={"dc " + c.cls + (lesson ? " has" : "") + (picked === date ? " sel" : "")}
+              className={
+                "dc " + c.cls + dowCls + (lesson ? " has" : "") + (holiday ? " holi" : "") + (picked === date ? " sel" : "")
+              }
               style={lesson ? { background: style!.soft, borderColor: style!.color } : undefined}
               onClick={() => date && lesson && setPicked(picked === date ? null : date)}
             >
               <span className="dnum">{c.n}</span>
+              {holiday && <span className="dholi">{holiday}</span>}
               {lesson && (
                 <>
                   <span className="dtrack" style={{ color: style!.color }}>{lesson.track}</span>
