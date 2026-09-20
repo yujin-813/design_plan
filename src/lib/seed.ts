@@ -1,4 +1,11 @@
 // 시드(데모) 데이터 — Supabase가 설정되지 않아도 앱이 이 데이터로 렌더됩니다.
+
+// 수업방(room) 안에 들어가는 것들. 공지가 없는 과정도 있어서
+// 빈 배열에 타입을 붙여줘야 화면에서 타입이 갈라지지 않습니다.
+export type RoomNotice = { id: string; title: string; date: string; body: string };
+export type RoomMaterial = { title: string; date: string };
+export type RoomAssignment = { title: string; due: string };
+
 export const seed = {
   me: { name: "유진", cohort: "7기", role: "member" },
 
@@ -116,7 +123,7 @@ export const seed = {
       summary: "AI로 광고 카피·이미지를 대량 생성하고 성과 데이터로 골라내는 법을 4주간 실습합니다.",
       curriculum: ["1주차 · 생성형 AI 소재 브리프 작성법", "2주차 · 이미지·카피 배치 생성 워크플로우", "3주차 · A/B 테스트 설계와 지표 해석", "4주차 · 실제 캠페인에 적용해보기"],
       color: "var(--sky-deep)",
-      room: { notices: [], materials: [], assignments: [] },
+      room: { notices: [] as RoomNotice[], materials: [] as RoomMaterial[], assignments: [] as RoomAssignment[] },
       alumni: { jobs: [], nextSessions: [] },
     },
     {
@@ -144,7 +151,7 @@ export const seed = {
       summary: "브랜드 톤앤매너를 잡고 SNS·뉴스레터 카피를 빠르게 뽑아내는 라이팅 스킬을 다룹니다.",
       curriculum: ["세부 커리큘럼 공개 예정입니다."],
       color: "var(--violet-2)",
-      room: { notices: [], materials: [], assignments: [] },
+      room: { notices: [] as RoomNotice[], materials: [] as RoomMaterial[], assignments: [] as RoomAssignment[] },
       alumni: { jobs: [], nextSessions: [] },
     },
     {
@@ -153,7 +160,7 @@ export const seed = {
       summary: "이벤트 설계부터 리포트 확인까지, 하루 만에 GA4 세팅을 끝내는 초압축 워크숍입니다.",
       curriculum: ["오전 · GA4 계정·속성·이벤트 설계", "오후 · 전환 설정과 리포트 실습"],
       color: "var(--warm-deep)",
-      room: { notices: [], materials: [], assignments: [] },
+      room: { notices: [] as RoomNotice[], materials: [] as RoomMaterial[], assignments: [] as RoomAssignment[] },
       alumni: { jobs: [], nextSessions: [] },
     },
     {
@@ -162,7 +169,7 @@ export const seed = {
       summary: "AI로 카피 초안을 뽑고 다듬는 법을 이틀 동안 집중적으로 실습합니다.",
       curriculum: ["1일차 · AI 카피 브리프·초안 생성", "2일차 · 톤 다듬기와 A/B 테스트 카피 뽑기"],
       color: "var(--sky-deep)",
-      room: { notices: [], materials: [], assignments: [] },
+      room: { notices: [] as RoomNotice[], materials: [] as RoomMaterial[], assignments: [] as RoomAssignment[] },
       alumni: { jobs: [], nextSessions: [] },
     },
   ],

@@ -19,17 +19,10 @@ export default function ProgramRoom({ p }: { p: Program }) {
         <h3 style={{ fontSize: 14.5, fontWeight: 800, marginBottom: 10 }}>공지사항</h3>
         {p.room.notices.length === 0 && <small style={{ color: "var(--faint)" }}>등록된 공지가 없어요.</small>}
         {p.room.notices.map((n, i) =>
-          "id" in n ? (
-            <Link href={`/my-courses/notices/${n.id}`} key={n.id} className="dash-row" style={{ display: "block", padding: "8px 0", borderTop: i > 0 ? "1px solid var(--border)" : undefined }}>
-              <p style={{ margin: 0, fontSize: 13, fontWeight: 500 }}>{n.title}</p>
-              <small style={{ color: "var(--faint)" }}>{n.date}</small>
-            </Link>
-          ) : (
-            <div key={i} style={{ padding: "8px 0", borderTop: i > 0 ? "1px solid var(--border)" : undefined }}>
-              <p style={{ margin: 0, fontSize: 13, fontWeight: 500 }}>{n.title}</p>
-              <small style={{ color: "var(--faint)" }}>{n.date}</small>
-            </div>
-          )
+          <Link href={`/my-courses/notices/${n.id}`} key={n.id} className="dash-row" style={{ display: "block", padding: "8px 0", borderTop: i > 0 ? "1px solid var(--border)" : undefined }}>
+            <p style={{ margin: 0, fontSize: 13, fontWeight: 500 }}>{n.title}</p>
+            <small style={{ color: "var(--faint)" }}>{n.date}</small>
+          </Link>
         )}
       </div>
       <div className="card" style={{ padding: 18 }}>
@@ -49,7 +42,7 @@ export default function ProgramRoom({ p }: { p: Program }) {
           <div key={i} style={{ padding: "10px 0", borderTop: i > 0 ? "1px solid var(--border)" : undefined }}>
             <p style={{ margin: 0, fontSize: 13, fontWeight: 500 }}>{a.title}</p>
             <small style={{ color: "var(--faint)" }}>{a.due}</small>
-            <AssignmentUpload programId={p.id} assignment={a.title} submittedBy={seed.me.name} />
+            <AssignmentUpload programId={p.id} assignment={a.title} />
           </div>
         ))}
       </div>

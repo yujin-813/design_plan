@@ -4,6 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import Logo from "./Logo";
 import { REQUIRE_LOGIN } from "@/lib/session";
+import { clearSubscriptionCache } from "./SubscribeButton";
 
 type Profile = { name: string; cohort: string; role: string; status?: string; signedIn?: boolean };
 type NavChild = { href: string; label: string };
@@ -14,6 +15,7 @@ const loginIcon = <><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" /><path d="
 const logoutIcon = <><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" /><path d="M16 17l5-5-5-5M21 12H9" /></>;
 
 const adminIcon = <><path d="M12 3l8 4v5c0 4.4-3.2 7.9-8 9-4.8-1.1-8-4.6-8-9V7z" /><path d="M9 12l2 2 4-4" /></>;
+const contentIcon = <><path d="M5 3h9l5 5v13H5z" /><path d="M14 3v5h5" /><path d="M9 13h6M9 17h4" /></>;
 
 // 승인 전 수강생·비로그인 방문자에게 보이는 메뉴
 const guestGroups: { label?: string; items: NavItem[] }[] = [
@@ -22,7 +24,13 @@ const guestGroups: { label?: string; items: NavItem[] }[] = [
 
 // 운영자 메뉴
 const adminGroups: { label?: string; items: NavItem[] }[] = [
-  { label: "운영", items: [{ href: "/admin/members", label: "가입자 관리", icon: adminIcon }] },
+  {
+    label: "운영",
+    items: [
+      { href: "/admin/members", label: "가입자 관리", icon: adminIcon },
+      { href: "/admin/content", label: "콘텐츠 관리", icon: contentIcon },
+    ],
+  },
 ];
 
 const groups: { label?: string; items: NavItem[] }[] = [
@@ -87,6 +95,7 @@ const crumbMap: Record<string, string> = {
   "/my-courses/assignments": "과제확인", "/my-courses/schedule": "일정확인",
   "/programs": "강의목록", "/alumni": "취업정보", "/docs": "기획서",
   "/mentors": "멘토링 신청", "/profile": "프로필", "/admin/members": "가입자 관리",
+  "/admin/content": "콘텐츠 관리",
 };
 
 export default function AppShell({
@@ -132,6 +141,8 @@ export default function AppShell({
 
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST" });
+    // 같은 브라우저를 다른 사람이 써도 이전 사람 구독이 남지 않도록 비웁니다.
+    clearSubscriptionCache();
     router.push("/login");
     router.refresh();
   }

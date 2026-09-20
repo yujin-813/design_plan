@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createMember } from "@/lib/members";
 import { findCohort } from "@/lib/curriculum";
+import { enroll } from "@/lib/enrollments";
 
 export const runtime = "nodejs";
 
@@ -25,6 +26,9 @@ export async function POST(req: NextRequest) {
 
   const result = createMember({ name, email, password, phone, cohortId });
   if (!result.ok) return NextResponse.json({ error: result.error }, { status: 409 });
+
+  // 신청한 기수를 첫 수강 기록으로 남깁니다. (나중에 운영자가 기수를 더 배정할 수 있어요)
+  enroll(result.member.email, cohortId);
 
   return NextResponse.json({ ok: true, member: result.member }, { status: 201 });
 }

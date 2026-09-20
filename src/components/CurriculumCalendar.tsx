@@ -1,7 +1,7 @@
 "use client";
 import { useMemo, useState } from "react";
 import { buildMonthGrid, monthLabel } from "@/lib/calendarGrid";
-import { cohorts, holidayName, lessons, trackStyle, weeks, weekHours, totalHours, type Track } from "@/lib/curriculum";
+import { findCohort, getCurriculum, holidayName, trackStyle, weekHours, totalHours, type Track } from "@/lib/curriculum";
 
 const DOWS = ["월", "화", "수", "목", "금", "토", "일"];
 
@@ -9,10 +9,36 @@ function ymd(year: number, month0: number, day: number) {
   return `${year}-${String(month0 + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 }
 
-export default function CurriculumCalendar() {
-  const cohort = cohorts[0];
+// 로그인한 사람의 기수 일정을 보여줍니다. cohortId 는 서버에서 내려옵니다.
+export default function CurriculumCalendar({ cohortId }: { cohortId: string | null }) {
+  const cohort = cohortId ? findCohort(cohortId) : null;
+  const curriculum = getCurriculum(cohortId);
+
+  if (!cohort || !curriculum) {
+    return (
+      <div style={{ padding: "28px 8px", textAlign: "center", color: "var(--faint)" }}>
+        <p style={{ margin: 0, fontSize: 14 }}>
+          {cohort
+            ? `${cohort.label} 수업 일정이 아직 등록되지 않았어요.`
+            : "배정된 기수가 없어요. 운영팀 승인 후에 일정이 열립니다."}
+        </p>
+      </div>
+    );
+  }
+
+  return <CohortCalendar cohort={cohort} curriculum={curriculum} />;
+}
+
+function CohortCalendar({
+  cohort,
+  curriculum,
+}: {
+  cohort: NonNullable<ReturnType<typeof findCohort>>;
+  curriculum: NonNullable<ReturnType<typeof getCurriculum>>;
+}) {
+  const { lessons, weeks } = curriculum;
   const today = new Date();
-  // 과정 기간(9~11월) 안에서 시작하도록 맞춥니다.
+  // 과정 기간 안에서 시작하도록 맞춥니다.
   const first = lessons[0].date;
   const startYear = Number(first.slice(0, 4));
   const startMonth0 = Number(first.slice(5, 7)) - 1;
@@ -26,11 +52,11 @@ export default function CurriculumCalendar() {
     const map = new Map<string, (typeof lessons)[number]>();
     lessons.forEach((l) => map.set(l.date, l));
     return map;
-  }, []);
+  }, [lessons]);
 
   const monthLessons = useMemo(
     () => lessons.filter((l) => l.date.startsWith(`${year}-${String(month0 + 1).padStart(2, "0")}`)),
-    [year, month0]
+    [lessons, year, month0]
   );
 
   const cells = buildMonthGrid(year, month0, today);
@@ -51,7 +77,7 @@ export default function CurriculumCalendar() {
         <div>
           <span className="pill v">{cohort.org}</span>
           <h2>{cohort.label} 교육 일정</h2>
-          <p>{cohort.period} · 총 {lessons.length}일 {totalHours}시간</p>
+          <p>{cohort.period} · 총 {lessons.length}일 {totalHours(curriculum)}시간</p>
         </div>
         <div className="nb">
           <button onClick={() => shift(-1)} aria-label="이전 달">‹</button>
@@ -74,7 +100,7 @@ export default function CurriculumCalendar() {
           const date = c.inMonth ? ymd(year, month0, c.n) : null;
           const lesson = date ? byDate.get(date) : null;
           const style = lesson ? trackStyle[lesson.track] : null;
-          const holiday = date ? holidayName(date) : null;
+          const holiday = date ? holidayName(curriculum, date) : null;
           const dow = i % 7; // 0=월 … 5=토, 6=일
           const dowCls = dow === 5 ? " sat" : dow === 6 ? " sun" : "";
           return (
@@ -121,7 +147,7 @@ export default function CurriculumCalendar() {
             <div className="cur-week-no">{w.week}주차</div>
             <div className="cur-week-main">
               <b>{w.theme}</b>
-              <small>{w.range} · {weekHours(w.week)}시간</small>
+              <small>{w.range} · {weekHours(curriculum, w.week)}시간</small>
               {w.note && <span className="cur-week-note">※ {w.note}</span>}
             </div>
           </div>

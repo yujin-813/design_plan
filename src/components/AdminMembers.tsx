@@ -1,6 +1,6 @@
 "use client";
 import { useMemo, useState } from "react";
-import { cohorts } from "@/lib/curriculum";
+import MemberEnrollments from "@/components/MemberEnrollments";
 import type { PublicMember } from "@/lib/members";
 
 type Counts = { total: number; pending: number; approved: number; rejected: number };
@@ -37,6 +37,8 @@ export default function AdminMembers({
   const [stat, setStat] = useState(initialCounts);
   const [tab, setTab] = useState<(typeof TABS)[number]["key"]>("pending");
   const [busy, setBusy] = useState<string | null>(null);
+  // 수강 기수 패널을 펼친 회원
+  const [openRow, setOpenRow] = useState<string | null>(null);
 
   const shown = useMemo(
     () => (tab === "all" ? members : members.filter((m) => m.status === tab)),
@@ -66,10 +68,6 @@ export default function AdminMembers({
     const data = await res.json();
     setMembers((list) => list.map((m) => (m.id === id ? data.member : m)));
     setStat(data.counts);
-  }
-
-  function cohortLabel(id: string) {
-    return cohorts.find((c) => c.id === id)?.label ?? id;
   }
 
   return (
@@ -117,14 +115,21 @@ export default function AdminMembers({
         )}
 
         {shown.map((m) => (
-          <div className="mrow" key={m.id}>
+          <div key={m.id}>
+          <div className="mrow">
             <div className="mrow-av">{m.name.slice(0, 2)}</div>
             <div className="mrow-main">
               <b>{m.name}</b>
               <small>{m.email}{m.phone ? ` · ${m.phone}` : ""}</small>
             </div>
             <div className="mrow-cohort">
-              <span className="pill v">{cohortLabel(m.cohortId)}</span>
+              <button
+                type="button"
+                className="btn sm"
+                onClick={() => setOpenRow(openRow === m.id ? null : m.id)}
+              >
+                수강 기수 {openRow === m.id ? "▲" : "▼"}
+              </button>
               <small>{fmt(m.joinedAt)} 신청</small>
             </div>
             <div className="mrow-actions">
@@ -150,6 +155,12 @@ export default function AdminMembers({
                 삭제
               </button>
             </div>
+          </div>
+          {openRow === m.id && (
+            <div style={{ padding: "0 18px 6px", borderBottom: "1px solid var(--border)" }}>
+              <MemberEnrollments email={m.email} />
+            </div>
+          )}
           </div>
         ))}
       </div>

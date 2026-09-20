@@ -1,16 +1,18 @@
 // K-디지털 뉴딜 아카데미 AI 마케팅 과정 기수/커리큘럼 정의.
 // 가입할 때 고르는 과정·기수 목록이자, 일정 달력의 원본 데이터입니다.
 
-export type CohortId = "ai-marketing-3";
+export type CohortId = string;
 
 export type CohortInfo = {
   id: CohortId;
-  course: string;
-  cohort: string;
+  course: string;   // 강의명 — 같은 강의의 여러 기수를 묶는 기준
+  cohort: string;   // 기수 표기
   label: string;
   org: string;
-  period: string;
-  open: boolean; // 지금 가입받는 기수인지
+  period: string;   // 화면에 보여줄 기간 문구
+  startDate: string; // YYYY-MM-DD — 수강중/수료 판단에 씁니다
+  endDate: string;   // YYYY-MM-DD
+  open: boolean;    // 지금 가입받는 기수인지
 };
 
 export const cohorts: CohortInfo[] = [
@@ -21,9 +23,51 @@ export const cohorts: CohortInfo[] = [
     label: "AI 마케팅 3기",
     org: "K-디지털 뉴딜 아카데미",
     period: "2026.09.21 ~ 11.19",
+    startDate: "2026-09-21",
+    endDate: "2026-11-19",
     open: true,
   },
+  // 지난 기수 — 수료생이 커뮤니티를 계속 쓰도록 남겨둡니다.
+  // open: false 라 가입 화면 선택지에는 뜨지 않고, 운영자가 직접 배정합니다.
+  // TODO: 아래 두 기수의 기간은 임시값입니다. 실제 운영 기간으로 바꿔주세요.
+  {
+    id: "ai-marketing-2",
+    course: "AI 마케팅",
+    cohort: "2기",
+    label: "AI 마케팅 2기",
+    org: "K-디지털 뉴딜 아카데미",
+    period: "2026.03.02 ~ 04.30",
+    startDate: "2026-03-02",
+    endDate: "2026-04-30",
+    open: false,
+  },
+  {
+    id: "ai-marketing-1",
+    course: "AI 마케팅",
+    cohort: "1기",
+    label: "AI 마케팅 1기",
+    org: "K-디지털 뉴딜 아카데미",
+    period: "2025.09.01 ~ 10.31",
+    startDate: "2025-09-01",
+    endDate: "2025-10-31",
+    open: false,
+  },
 ];
+
+/** 오늘 기준으로 이 기수가 어느 단계인지 */
+export type CohortPhase = "upcoming" | "ongoing" | "ended";
+
+export function cohortPhase(cohort: CohortInfo, today = new Date()): CohortPhase {
+  const ymd = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+  if (ymd < cohort.startDate) return "upcoming";
+  if (ymd > cohort.endDate) return "ended";
+  return "ongoing";
+}
+
+/** 강의명으로 묶은 기수 목록 (필터용) */
+export function courseNames(): string[] {
+  return [...new Set(cohorts.map((c) => c.course))];
+}
 
 export function findCohort(id: string) {
   return cohorts.find((c) => c.id === id) ?? null;
@@ -41,7 +85,7 @@ export const trackStyle: Record<Track, { color: string; soft: string; label: str
 };
 
 // 교육 기간에 걸치는 공휴일 (대체공휴일 포함)
-export const holidays: Record<string, string> = {
+const aiMarketing3Holidays: Record<string, string> = {
   "2026-09-24": "추석 연휴",
   "2026-09-25": "추석",
   "2026-09-26": "추석 연휴",
@@ -52,9 +96,6 @@ export const holidays: Record<string, string> = {
   "2026-12-25": "성탄절",
 };
 
-export function holidayName(date: string) {
-  return holidays[date] ?? null;
-}
 
 export type Lesson = {
   date: string; // YYYY-MM-DD
@@ -66,7 +107,7 @@ export type Lesson = {
 
 export type WeekInfo = { week: number; range: string; theme: string; note?: string };
 
-export const weeks: WeekInfo[] = [
+const aiMarketing3Weeks: WeekInfo[] = [
   { week: 1, range: "9/21 ~ 9/23", theme: "개강", note: "9/24~9/27 추석 연휴" },
   { week: 2, range: "9/28 ~ 10/2", theme: "바이브코딩 · 어도비 착수" },
   { week: 3, range: "10/6 ~ 10/8", theme: "마케팅 본 수업", note: "10/5 대체공휴일, 10/9 한글날" },
@@ -80,7 +121,7 @@ export const weeks: WeekInfo[] = [
 
 const MARKETING = "AI Marketing Foundation & Digital Marketing Essential (퍼널/STP)";
 
-export const lessons: Lesson[] = [
+const aiMarketing3Lessons: Lesson[] = [
   // 1주차
   { date: "2026-09-21", week: 1, subject: "입교식 및 OT (11:00~18:00) · AI Marketing Foundation", track: "최재우", hours: 6 },
   { date: "2026-09-22", week: 1, subject: MARKETING, track: "최재우", hours: 8 },
@@ -140,13 +181,45 @@ export const lessons: Lesson[] = [
   { date: "2026-11-19", week: 9, subject: "프로젝트 발표 및 수료식", track: "공통", hours: 8 },
 ];
 
-export const totalHours = lessons.reduce((s, l) => s + l.hours, 0);
+// ─── 기수별 커리큘럼 ─────────────────────────────────────────────
+// 수업 일정·주차·공휴일은 기수마다 다릅니다. 기수를 새로 열 때는
+// cohorts 에 항목을 추가하고 여기에 커리큘럼을 같이 등록하세요.
+// 등록하지 않으면 달력이 "아직 등록 전" 안내를 보여줍니다.
 
-export function weekHours(week: number) {
-  return lessons.filter((l) => l.week === week).reduce((s, l) => s + l.hours, 0);
+export type Curriculum = {
+  cohortId: string;
+  weeks: WeekInfo[];
+  lessons: Lesson[];
+  holidays: Record<string, string>;
+};
+
+export const curriculumByCohort: Record<string, Curriculum> = {
+  "ai-marketing-3": {
+    cohortId: "ai-marketing-3",
+    weeks: aiMarketing3Weeks,
+    lessons: aiMarketing3Lessons,
+    holidays: aiMarketing3Holidays,
+  },
+};
+
+export function getCurriculum(cohortId: string | null | undefined): Curriculum | null {
+  if (!cohortId) return null;
+  return curriculumByCohort[cohortId] ?? null;
 }
 
-export function lessonsByMonth(year: number, month0: number) {
+export function holidayName(c: Curriculum, date: string) {
+  return c.holidays[date] ?? null;
+}
+
+export function totalHours(c: Curriculum) {
+  return c.lessons.reduce((sum, l) => sum + l.hours, 0);
+}
+
+export function weekHours(c: Curriculum, week: number) {
+  return c.lessons.filter((l) => l.week === week).reduce((sum, l) => sum + l.hours, 0);
+}
+
+export function lessonsByMonth(c: Curriculum, year: number, month0: number) {
   const prefix = `${year}-${String(month0 + 1).padStart(2, "0")}-`;
-  return lessons.filter((l) => l.date.startsWith(prefix));
+  return c.lessons.filter((l) => l.date.startsWith(prefix));
 }

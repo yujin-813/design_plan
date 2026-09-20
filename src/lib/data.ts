@@ -2,6 +2,8 @@ import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { seed } from "@/lib/seed";
 import { SESSION_COOKIE } from "@/lib/auth";
+import { readPosts } from "@/lib/posts";
+import { countComments } from "@/lib/comments";
 
 export type PostView = {
   id: number | string;
@@ -48,17 +50,40 @@ export async function getProfile() {
   };
 }
 
-// 게시글 목록 (DB → 시드 폴백)
+// 회원이 쓴 글을 화면용 형태로 바꿉니다.
+function userPosts(): PostView[] {
+  return readPosts().map((p) => ({
+    id: p.id,
+    author: p.author,
+    color: p.color,
+    cohort: p.cohort,
+    cat: p.cat,
+    ago: ago(p.createdAt),
+    title: p.title,
+    excerpt: p.body.slice(0, 60) || p.title,
+    body: p.body,
+    likes: p.likes,
+    comments: countComments(`post:${p.id}`),
+    views: p.views,
+  }));
+}
+
+// 시드 글의 댓글 수도 실제 저장된 댓글로 맞춥니다.
+function seedPosts(): PostView[] {
+  return seed.posts.map((p) => ({ ...p, comments: countComments(`post:${p.id}`) }));
+}
+
+// 게시글 목록 — 회원이 쓴 글이 위, 그 아래가 기존 글입니다.
 export async function getPosts(): Promise<PostView[]> {
   const supabase = createClient();
-  if (!supabase) return seed.posts;
+  if (!supabase) return [...userPosts(), ...seedPosts()];
   try {
     const { data, error } = await supabase
       .from("posts")
       .select("id,title,body,views,created_at,categories(name),profiles(name,cohort,avatar_color)")
       .order("created_at", { ascending: false })
       .limit(30);
-    if (error || !data || data.length === 0) return seed.posts;
+    if (error || !data || data.length === 0) return [...userPosts(), ...seedPosts()];
     return data.map((r: any) => ({
       id: r.id,
       author: r.profiles?.name ?? "회원",
@@ -74,7 +99,7 @@ export async function getPosts(): Promise<PostView[]> {
       views: r.views ?? 0,
     }));
   } catch {
-    return seed.posts;
+    return [...userPosts(), ...seedPosts()];
   }
 }
 

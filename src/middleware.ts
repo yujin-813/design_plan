@@ -16,6 +16,11 @@ export function middleware(req: NextRequest) {
 
   if (!session) {
     if (isAllowed(pathname, GUEST_ALLOWED)) return NextResponse.next();
+    // API는 화면으로 돌려보내지 않고 401을 돌려줍니다.
+    // (fetch 응답으로 로그인 HTML이 오면 화면이 깨집니다.)
+    if (pathname.startsWith("/api/")) {
+      return NextResponse.json({ error: "로그인이 필요해요." }, { status: 401 });
+    }
     const url = req.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
