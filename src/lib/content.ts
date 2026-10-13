@@ -1,12 +1,12 @@
 import fs from "fs";
 import path from "path";
 
-// 운영자가 직접 작성하는 콘텐츠(공지·자료·과제·이벤트)를 한 파일에 모아둡니다.
+// 운영자가 직접 작성하는 콘텐츠(공지·자료·과제·이벤트·레터·프로젝트)를 한 파일에 모아둡니다.
 // 예전에는 전부 seed.ts 코드에 박혀 있어서 개발자만 바꿀 수 있었습니다.
 const DATA_DIR = path.join(process.cwd(), "data");
 const FILE = path.join(DATA_DIR, "content.json");
 
-export type ContentKind = "notice" | "material" | "assignment" | "event";
+export type ContentKind = "notice" | "material" | "assignment" | "event" | "letter" | "project";
 
 // 누구에게 보일지. 전체 공개이거나, 특정 기수 전용입니다.
 export type Scope = { type: "all" } | { type: "cohort"; cohortId: string };
@@ -23,20 +23,26 @@ export type ContentItem = {
   pinned?: boolean;
   /** 과제 마감일·이벤트 일시 등 화면에 그대로 보여줄 문구 */
   dueLabel?: string;
-  /** 자료 링크 (material 전용) */
+  /** 자료 링크(material) · 원문 링크(letter) */
   url?: string;
+  /** 출처 — 레터·매체 이름 (letter 전용) */
+  source?: string;
+  /** 지원 마감 (project 전용) */
+  closed?: boolean;
   createdBy: string;
   createdAt: string;
   updatedAt?: string;
 };
 
-export const CONTENT_KINDS: ContentKind[] = ["notice", "material", "assignment", "event"];
+export const CONTENT_KINDS: ContentKind[] = ["notice", "material", "assignment", "event", "letter", "project"];
 
 export const KIND_LABEL: Record<ContentKind, string> = {
   notice: "공지",
   material: "자료",
   assignment: "과제",
   event: "이벤트",
+  letter: "레터·뉴스",
+  project: "프로젝트",
 };
 
 function ensure() {

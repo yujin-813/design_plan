@@ -3,6 +3,7 @@ import path from "path";
 import { execFileSync } from "child_process";
 
 export const docs = [
+  { slug: "community-direction", title: "알테라 커뮤니티 방향", desc: "커뮤니티의 목적과 우선순위, 운영 방식을 정리한 문서" },
   { slug: "arki-spec", title: "알테라 기획서", desc: "전체 페이지 구조와 기능을 정리한 서비스 기획 문서" },
 ];
 

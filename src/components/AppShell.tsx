@@ -45,7 +45,8 @@ const groups: { label?: string; items: NavItem[] }[] = [
     label: "커뮤니티",
     items: [
       { href: "/community", label: "자유수다", icon: <><path d="M4 5h16v11H8l-4 4z" /><path d="M8 9h8M8 12h5" /></> },
-      { href: "/news", label: "AI 뉴스", icon: <><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 3" /></> },
+      { href: "/news", label: "레터·뉴스", icon: <><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 3" /></> },
+      { href: "/projects", label: "프로젝트", icon: <><path d="M4 8h16v11H4z" /><path d="M9 8V5h6v3M4 13h16" /></> },
     ],
   },
   {
@@ -68,7 +69,6 @@ const groups: { label?: string; items: NavItem[] }[] = [
         ],
       },
       { href: "/programs", label: "강의목록", icon: <><path d="M12 3l9 5-9 5-9-5 9-5z" /><path d="M6 10.5V16c0 1.5 2.7 3 6 3s6-1.5 6-3v-5.5" /></> },
-      { href: "/alumni", label: "취업정보", icon: <><path d="M12 3l9 4.5-9 4.5-9-4.5L12 3z" /><path d="M6 10v5c1 2 4 3 6 3s5-1 6-3v-5" /></> },
       { href: "/mentors", label: "멘토링 신청", icon: <><circle cx="9" cy="8" r="3" /><path d="M3 20a6 6 0 0112 0M17 11l2 2 4-4" /></> },
     ],
   },
@@ -90,10 +90,10 @@ const groups: { label?: string; items: NavItem[] }[] = [
 
 const crumbMap: Record<string, string> = {
   "/": "홈", "/notices": "공지사항", "/events": "이벤트", "/community": "자유수다",
-  "/news": "AI 뉴스", "/subscriptions": "구독", "/scrap": "스크랩",
+  "/news": "레터·뉴스", "/subscriptions": "구독", "/scrap": "스크랩",
   "/my-courses": "내 수업", "/my-courses/notices": "공지보기", "/my-courses/materials": "자료실",
   "/my-courses/assignments": "과제확인", "/my-courses/schedule": "일정확인",
-  "/programs": "강의목록", "/alumni": "취업정보", "/docs": "기획서",
+  "/programs": "강의목록", "/projects": "프로젝트", "/docs": "기획서",
   "/mentors": "멘토링 신청", "/profile": "프로필", "/admin/members": "가입자 관리",
   "/admin/content": "콘텐츠 관리",
 };

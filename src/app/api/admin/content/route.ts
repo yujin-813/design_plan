@@ -63,6 +63,8 @@ export async function POST(req: NextRequest) {
     pinned: Boolean(b?.pinned),
     dueLabel: b?.dueLabel ? String(b.dueLabel).trim() : undefined,
     url: b?.url ? String(b.url).trim() : undefined,
+    source: b?.source ? String(b.source).trim() : undefined,
+    closed: kind === "project" ? Boolean(b?.closed) : undefined,
     createdBy: admin.name,
   });
 
@@ -92,6 +94,8 @@ export async function PATCH(req: NextRequest) {
   if (b?.pinned !== undefined) patch.pinned = Boolean(b.pinned);
   if (b?.dueLabel !== undefined) patch.dueLabel = String(b.dueLabel).trim();
   if (b?.url !== undefined) patch.url = String(b.url).trim();
+  if (b?.source !== undefined) patch.source = String(b.source).trim();
+  if (b?.closed !== undefined) patch.closed = Boolean(b.closed);
 
   const item = updateItem(id, patch);
   if (!item) return NextResponse.json({ error: "항목을 찾을 수 없어요." }, { status: 404 });
