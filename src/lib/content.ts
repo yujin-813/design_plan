@@ -71,14 +71,21 @@ export function listAll(kind?: ContentKind): ContentItem[] {
   return kind ? all.filter((c) => c.kind === kind) : all;
 }
 
-/** 콘텐츠를 볼 사람. 듣는 기수가 여러 개일 수 있습니다. */
-export type Viewer = { role: string; cohortIds: string[] };
+/**
+ * 콘텐츠를 볼 사람. 듣는 기수가 여러 개일 수 있습니다.
+ * activeCohortIds 는 지금 수강 중인 기수 — 없으면 cohortIds 를 그대로 씁니다.
+ */
+export type Viewer = { role: string; cohortIds: string[]; activeCohortIds?: string[] };
+
+/** 수업 공간 콘텐츠. 수료하면 그 기수 전용 항목은 닫힙니다. */
+const CLASS_KINDS: ContentKind[] = ["notice", "material", "assignment"];
 
 /** 이 사람에게 보여도 되는가 */
 export function canSee(item: ContentItem, viewer: Viewer) {
   if (viewer.role === "admin") return true;
   if (item.scope.type === "all") return true;
-  return viewer.cohortIds.includes(item.scope.cohortId);
+  const ids = CLASS_KINDS.includes(item.kind) ? viewer.activeCohortIds ?? viewer.cohortIds : viewer.cohortIds;
+  return ids.includes(item.scope.cohortId);
 }
 
 /** 수강생용 — 전체 공개 + 내 기수 것만, 최신순 */

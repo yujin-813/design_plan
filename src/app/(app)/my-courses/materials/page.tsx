@@ -1,5 +1,6 @@
 import RoomFilter from "@/components/mycourses/RoomFilter";
 import RoomItems from "@/components/RoomItems";
+import ClosedRoom from "@/components/mycourses/ClosedRoom";
 import SubscribedMaterials from "@/components/mycourses/SubscribedMaterials";
 import { getMyRooms } from "@/lib/cohortRoom";
 import { toSummary } from "@/lib/roomSummary";
@@ -8,7 +9,7 @@ export const dynamic = "force-dynamic";
 
 export default function MyCoursesMaterialsPage() {
   const rooms = getMyRooms().map((r) =>
-    toSummary(r, <RoomItems kind="material" items={r.materials} />)
+    toSummary(r, r.closed ? <ClosedRoom chat={r.chat} /> : <RoomItems kind="material" items={r.materials} />)
   );
 
   return (

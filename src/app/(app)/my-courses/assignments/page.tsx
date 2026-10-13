@@ -1,5 +1,6 @@
 import RoomFilter from "@/components/mycourses/RoomFilter";
 import RoomItems from "@/components/RoomItems";
+import ClosedRoom from "@/components/mycourses/ClosedRoom";
 import SubscribedAssignments from "@/components/mycourses/SubscribedAssignments";
 import { getMyRooms } from "@/lib/cohortRoom";
 import { toSummary } from "@/lib/roomSummary";
@@ -8,7 +9,7 @@ export const dynamic = "force-dynamic";
 
 export default function MyCoursesAssignmentsPage() {
   const rooms = getMyRooms().map((r) =>
-    toSummary(r, <RoomItems kind="assignment" items={r.assignments} submitKey={r.submitKey} />)
+    toSummary(r, r.closed ? <ClosedRoom chat={r.chat} /> : <RoomItems kind="assignment" items={r.assignments} submitKey={r.submitKey} />)
   );
 
   return (

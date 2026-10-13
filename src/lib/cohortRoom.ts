@@ -15,6 +15,10 @@ export type Room = {
   assignments: ContentItem[];
   /** 과제 제출을 묶는 키 */
   submitKey: string;
+  /** 수료·중도 종료로 수업 공간이 닫혔는가 */
+  closed: boolean;
+  /** 동기 대화방에 들어갈 수 있는가 (중도 종료는 제외) */
+  chat: boolean;
 };
 
 /**
@@ -35,16 +39,20 @@ export function getMyRooms(): Room[] {
   const rooms = entries.flatMap(({ cohortId, state }) => {
     const cohort = findCohort(cohortId);
     if (!cohort) return [];
+    // 수업이 끝난 강의실은 공지·자료·과제를 닫고 동기 대화방만 남깁니다.
+    const closed = state !== "active";
     const viewer = { role: user.role, cohortIds: [cohortId] };
     return [{
       cohortId,
       cohort,
       state,
       stateLabel: STATE_LABEL[state],
-      notices: listVisible("notice", viewer),
-      materials: listVisible("material", viewer),
-      assignments: listVisible("assignment", viewer),
+      notices: closed ? [] : listVisible("notice", viewer),
+      materials: closed ? [] : listVisible("material", viewer),
+      assignments: closed ? [] : listVisible("assignment", viewer),
       submitKey: cohortId,
+      closed,
+      chat: state !== "dropped",
     }];
   });
 

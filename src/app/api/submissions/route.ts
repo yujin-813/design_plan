@@ -55,6 +55,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "파일은 20MB 이하만 업로드할 수 있어요." }, { status: 400 });
   }
 
+  // 수료한 기수의 과제는 더 받지 않습니다. (수업 공간이 닫혔습니다)
+  if (user.role !== "admin" && user.cohortIds.includes(programId) && !user.activeCohortIds.includes(programId)) {
+    return NextResponse.json({ error: "수업이 끝나 과제 제출이 닫혔어요." }, { status: 403 });
+  }
+
   const safeProgramId = programId.replace(/[^\w-]/g, "_");
   const safeName = file.name.replace(/[/\\]/g, "_").slice(-120);
   const dir = path.join(process.cwd(), "public", "uploads", safeProgramId);
