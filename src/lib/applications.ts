@@ -43,6 +43,11 @@ export function listForProject(projectId: string): Application[] {
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
 }
 
+/** 내가 낸 지원서 전부 */
+export function listByEmail(email: string): Application[] {
+  return readAll().filter((a) => a.email === email);
+}
+
 /** 내가 지원한 프로젝트 id 목록 */
 export function appliedProjectIds(email: string): string[] {
   return readAll().filter((a) => a.email === email).map((a) => a.projectId);
