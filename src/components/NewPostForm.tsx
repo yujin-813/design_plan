@@ -6,7 +6,7 @@ import { seed } from "@/lib/seed";
 // 글쓰기 — 작성자는 서버가 로그인 세션에서 채웁니다.
 const CATEGORIES = seed.categories.filter((c) => c !== "전체");
 
-export default function NewPostForm() {
+export default function NewPostForm({ writer = "ok" }: { writer?: "ok" | "guest" | "pending" }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
@@ -32,6 +32,18 @@ export default function NewPostForm() {
     }
     setTitle(""); setBody(""); setOpen(false);
     router.refresh();
+  }
+
+  // 비회원은 로그인 화면으로, 승인 대기 중이면 안내만 합니다.
+  if (writer === "pending") {
+    return <span className="pill">운영팀 승인 후 글을 쓸 수 있어요</span>;
+  }
+  if (writer === "guest") {
+    return (
+      <a className="btn v" href="/login">
+        <svg className="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>로그인하고 글쓰기
+      </a>
+    );
   }
 
   if (!open) {
