@@ -130,7 +130,12 @@ export function countComments(topicId: string): number {
   return (SAMPLE[topicId]?.length ?? 0) + readAll().filter((c) => c.topicId === topicId).length;
 }
 
+/** 이 사람이 쓴 댓글 (프로필 최근 활동용) */
+export function listCommentsBy(email: string): StoredComment[] {
+  return readAll().filter((c) => c.authorEmail === email);
+}
+
 /** 이 사람이 쓴 댓글 수 (프로필 표시용) */
 export function countCommentsBy(email: string): number {
-  return readAll().filter((c) => c.authorEmail === email).length;
+  return listCommentsBy(email).length;
 }
