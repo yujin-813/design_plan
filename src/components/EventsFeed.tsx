@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { seed } from "@/lib/seed";
 import SubscribeButton from "./SubscribeButton";
+import EventSignupButton from "./EventSignupButton";
 
 export type FeedEvent = {
   id: string;
@@ -54,8 +55,8 @@ export default function EventsFeed({ authored = [] }: { authored?: FeedEvent[] }
             <div className="bd">
               {e.cohortLabel && <span className="pill v" style={{ marginBottom: 8 }}>{e.cohortLabel} 전용</span>}
               <div className="dt"><svg className="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2" /><path d="M3 9h18" /></svg>{e.date}</div>
-              <div style={{ display: "flex", gap: 8 }}>
-                <button className="btn v" style={{ flex: 1 }}>{e.price}</button>
+              <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+                <EventSignupButton eventId={e.id} label={e.price} />
                 <SubscribeButton kind="events" id={e.id} label="+ 구독" />
               </div>
             </div>

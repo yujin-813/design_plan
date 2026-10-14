@@ -3,7 +3,20 @@ import Link from "next/link";
 import { useState } from "react";
 import Logo from "@/components/Logo";
 import AuthBrandPanel from "@/components/AuthBrandPanel";
-import { cohorts } from "@/lib/curriculum";
+import { cohortPhase, cohorts, getCurriculum, totalHours } from "@/lib/curriculum";
+
+const PHASE: Record<string, { label: string; cls: string }> = {
+  ongoing: { label: "수강 중", cls: "mint" },
+  upcoming: { label: "개강 예정", cls: "sky" },
+  ended: { label: "수료", cls: "" },
+};
+
+// 기수마다 수업 날짜가 달라서, 일정이 등록된 기수는 수업 일수·시간도 함께 보여줍니다.
+function scheduleNote(id: string) {
+  const c = getCurriculum(id);
+  if (!c) return null;
+  return `수업 ${c.lessons.length}일 · 총 ${totalHours(c)}시간`;
+}
 
 export default function SignupPage() {
   const openCohorts = cohorts.filter((c) => c.open);
@@ -64,7 +77,7 @@ export default function SignupPage() {
         <form className="card authcard" onSubmit={onSubmit}>
           <Logo size={46} />
           <h1 style={{ marginTop: 18 }}>수강생 가입</h1>
-          <p className="sub">과정과 기수를 선택해 신청하면 운영팀 승인 후 이용할 수 있어요.</p>
+          <p className="sub">내가 들은(듣고 있는) 기수를 고르세요. 기수마다 수업 일정이 달라서, 승인되면 내 기수의 달력이 열려요.</p>
           {err && <div className="err">{err}</div>}
 
           <div className="field">
@@ -79,9 +92,14 @@ export default function SignupPage() {
                     checked={cohortId === c.id}
                     onChange={() => setCohortId(c.id)}
                   />
-                  <span>
-                    <b>{c.label}</b>
-                    <small>{c.org} · {c.period}</small>
+                  <span style={{ flex: 1 }}>
+                    <b>
+                      {c.label}{" "}
+                      <span className={"pill " + PHASE[cohortPhase(c)].cls} style={{ fontSize: 10.5, verticalAlign: "middle" }}>
+                        {PHASE[cohortPhase(c)].label}
+                      </span>
+                    </b>
+                    <small>{c.period}{scheduleNote(c.id) ? ` · ${scheduleNote(c.id)}` : ""}</small>
                   </span>
                 </label>
               ))}

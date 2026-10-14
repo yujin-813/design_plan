@@ -288,7 +288,7 @@ svg{stroke:currentColor;fill:none;stroke-width:1.7}
 .cohort-opt:hover{border-color:var(--violet-2)}
 .cohort-opt.on{border-color:var(--violet-2);background:var(--violet-soft)}
 .cohort-opt input{margin-top:3px;accent-color:var(--violet-2)}
-.cohort-opt span{display:flex;flex-direction:column;gap:2px}
+.cohort-opt>span{display:flex;flex-direction:column;gap:2px}
 .cohort-opt b{font-size:13.5px}
 .cohort-opt small{font-size:11.5px;color:var(--muted)}
 .signup-done{display:flex;flex-direction:column;gap:9px;background:var(--raise);border-radius:12px;padding:14px 16px;margin:20px 0}
