@@ -36,7 +36,7 @@ const groups: { label?: string; items: NavItem[] }[] = [
   {
     items: [
       { href: "/", label: "홈", icon: <><rect x="3" y="3" width="7" height="7" rx="2" /><rect x="14" y="3" width="7" height="7" rx="2" /><rect x="3" y="14" width="7" height="7" rx="2" /><rect x="14" y="14" width="7" height="7" rx="2" /></> },
-      { href: "/notices", label: "공지사항", badge: "3", icon: <><path d="M4 5h13v14H4z" /><path d="M17 8h3v9a2 2 0 01-2 2M7 9h7M7 13h7" /></> },
+      { href: "/notices", label: "공지사항", icon: <><path d="M4 5h13v14H4z" /><path d="M17 8h3v9a2 2 0 01-2 2M7 9h7M7 13h7" /></> },
       { href: "/events", label: "이벤트", isNew: true, icon: <><path d="M3 8l9-5 9 5-9 5z" /><path d="M7 10v5c0 1.5 2.5 3 5 3s5-1.5 5-3v-5" /></> },
     ],
   },

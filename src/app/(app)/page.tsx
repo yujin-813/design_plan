@@ -58,7 +58,7 @@ export default async function HomePage() {
           <div className="grid3">
             {seed.events.slice(0, 3).map((e) => (
               <div className="evcard card" style={{ padding: 0 }} key={e.id}>
-                <div className="top" style={{ background: `linear-gradient(to top, rgba(15,10,5,.72), rgba(15,10,5,.08)), url(${e.image}) center/cover no-repeat` }}>
+                <div className="top" style={{ background: `linear-gradient(to top, rgba(15,10,5,.72), rgba(15,10,5,.08)), ${e.image ? `url(${e.image}) center/cover no-repeat` : e.color}` }}>
                   <span className="lv">{e.type}</span>
                   <h4>{e.title}</h4>
                 </div>

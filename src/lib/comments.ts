@@ -36,16 +36,6 @@ const SAMPLE: Record<string, Array<{ author: string; cohort: string; text: strin
   "news:5": [
     { author: "이서연", cohort: "멘토", text: "리텐션 지표 정리 진짜 깔끔하네요, 스크랩 감사합니다!", at: "2시간 전" },
   ],
-  "post:1": [
-    { author: "이서연", cohort: "멘토", text: "저도 그 카페 가봤어요! 라떼 진짜 맛있죠 ☕", at: "1시간 전" },
-  ],
-  "post:2": [
-    { author: "박지훈", cohort: "3기", text: "감사합니다! 바로 써볼게요.", at: "3시간 전" },
-    { author: "정하영", cohort: "3기", text: "틱톡 시트 항목이 특히 유용하네요.", at: "2시간 전" },
-  ],
-  "notice:2": [
-    { author: "김민재", cohort: "3기", text: "장소 확정 감사합니다! 신청했어요.", at: "1일 전" },
-  ],
 };
 
 function ensure() {
