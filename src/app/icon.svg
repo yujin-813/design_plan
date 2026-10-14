@@ -1,6 +1,19 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="16" fill="#15503C"/>
-  <circle cx="28" cy="32" r="14" fill="#CFE9DA"/>
-  <circle cx="28" cy="32" r="6" fill="#15503C"/>
-  <rect x="39" y="18" width="11" height="28" rx="5.5" fill="#CFE9DA"/>
+  <!-- 알테라 스티커 a. 파비콘은 웹폰트를 못 쓰므로 a를 도형(볼+기둥)으로 그립니다. -->
+  <g transform="rotate(-8 30 36)">
+    <g fill="#15503C" stroke="#15503C" stroke-width="12" stroke-linejoin="round">
+      <circle cx="27" cy="38" r="14"/>
+      <rect x="33" y="22" width="11" height="30" rx="5.5"/>
+    </g>
+    <g fill="#15503C" stroke="#15503C" stroke-width="5" stroke-linejoin="round">
+      <circle cx="27" cy="38" r="14"/>
+      <rect x="33" y="22" width="11" height="30" rx="5.5"/>
+    </g>
+    <g fill="#CFE9DA">
+      <circle cx="27" cy="38" r="14"/>
+      <rect x="33" y="22" width="11" height="30" rx="5.5"/>
+    </g>
+    <circle cx="26" cy="38" r="5.5" fill="#15503C"/>
+  </g>
+  <circle cx="51" cy="14" r="9" fill="#E8834E" stroke="#15503C" stroke-width="3"/>
 </svg>

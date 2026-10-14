@@ -278,8 +278,9 @@ svg{stroke:currentColor;fill:none;stroke-width:1.7}
 .wm-back{fill:var(--brand-line);stroke:var(--brand-line);stroke-width:34px}
 .wm-face{fill:var(--brand-face);stroke:var(--brand-line);stroke-width:13px}
 .wm-badge{stroke:var(--brand-line);stroke-width:6px}
-.wm-mark{fill:var(--brand-face);stroke:var(--brand-line);stroke-width:7px}
-.wm-mark-letter{font-size:42px;fill:var(--brand-line);stroke:none}
+.wm-mark-back{font-size:56px;fill:var(--brand-line);stroke:var(--brand-line);stroke-width:16px}
+.wm-mark-face{font-size:56px;fill:var(--brand-face);stroke:var(--brand-line);stroke-width:6px}
+.wm-mark-badge{fill:var(--warm);stroke:var(--brand-line);stroke-width:3px}
 
 /* ── 가입 · 승인 · 운영자 ─────────────────────────── */
 .cohort-pick{display:flex;flex-direction:column;gap:8px}
