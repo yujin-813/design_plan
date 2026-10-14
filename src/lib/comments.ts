@@ -28,15 +28,7 @@ export type CommentView = {
 
 // 처음 둘러보는 사람에게도 대화가 오가는 것처럼 보이게 하는 예시 댓글.
 // 운영팀이 작성한 것으로 표시되며, 실제 회원 댓글과 섞여 시간순으로 나옵니다.
-const SAMPLE: Record<string, Array<{ author: string; cohort: string; text: string; at: string }>> = {
-  "news:1": [
-    { author: "정하영", cohort: "3기", text: "저희 팀도 이거 리포트에 바로 적용해봤어요, 시간 확실히 줄어드네요.", at: "1시간 전" },
-    { author: "박지훈", cohort: "3기", text: "이미지 이해력 얼마나 좋아졌는지 궁금하네요 👀", at: "42분 전" },
-  ],
-  "news:5": [
-    { author: "이서연", cohort: "멘토", text: "리텐션 지표 정리 진짜 깔끔하네요, 스크랩 감사합니다!", at: "2시간 전" },
-  ],
-};
+const SAMPLE: Record<string, Array<{ author: string; cohort: string; text: string; at: string }>> = {};
 
 function ensure() {
   if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
