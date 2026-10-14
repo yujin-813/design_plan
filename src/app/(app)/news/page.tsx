@@ -13,13 +13,25 @@ function Meta({ n }: { n: FeedItem }) {
   );
 }
 
-export default function NewsPage() {
-  const feed = getFeed(viewerOf(getCurrentUser()));
+export default async function NewsPage() {
+  const feed = await getFeed(viewerOf(getCurrentUser()));
   const [feat, ...rest] = feed;
+  if (!feat) {
+    return (
+      <>
+        <div className="phead">
+          <div><h1>레터·뉴스</h1><p>운영팀이 골라 온 레터와 AI타임스 최신 소식. 읽고 생각을 댓글로 나눠 주세요.</p></div>
+        </div>
+        <div className="card" style={{ padding: 28, color: "var(--faint)", textAlign: "center" }}>
+          소식을 불러오지 못했어요. 잠시 후 다시 확인해 주세요.
+        </div>
+      </>
+    );
+  }
   return (
     <>
       <div className="phead">
-        <div><h1>레터·뉴스</h1><p>운영팀이 골라 온 레터와 AI 소식. 읽고 생각을 댓글로 나눠 주세요.</p></div>
+        <div><h1>레터·뉴스</h1><p>운영팀이 골라 온 레터와 AI타임스 최신 소식. 읽고 생각을 댓글로 나눠 주세요.</p></div>
       </div>
       <div className="newsfeat">
         <Link

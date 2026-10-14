@@ -10,7 +10,8 @@ export default function CommentThread({ topicId }: { topicId: string }) {
   const [draft, setDraft] = useState("");
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
-  const [writer, setWriter] = useState<"ok" | "guest" | "pending">("ok");
+  // 서버 응답 전에는 입력창을 숨겨 비회원에게 잠깐 보였다 사라지지 않게 합니다.
+  const [writer, setWriter] = useState<"ok" | "guest" | "pending" | null>(null);
 
   const load = useCallback(async () => {
     const res = await fetch(`/api/comments?topicId=${encodeURIComponent(topicId)}`);

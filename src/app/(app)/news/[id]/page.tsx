@@ -6,8 +6,8 @@ import CommentThread from "@/components/CommentThread";
 
 export const dynamic = "force-dynamic";
 
-export default function NewsDetailPage({ params }: { params: { id: string } }) {
-  const n = findFeedItem(params.id, viewerOf(getCurrentUser()));
+export default async function NewsDetailPage({ params }: { params: { id: string } }) {
+  const n = await findFeedItem(params.id, viewerOf(getCurrentUser()));
   if (!n) notFound();
 
   return (
@@ -36,7 +36,12 @@ export default function NewsDetailPage({ params }: { params: { id: string } }) {
             )}
           </>
         ) : (
-          <div style={{ fontSize: 14.5, lineHeight: 1.8, color: "var(--ink)", whiteSpace: "pre-line" }}>{n.body}</div>
+          <>
+            <div style={{ fontSize: 14.5, lineHeight: 1.8, color: "var(--ink)", whiteSpace: "pre-line", marginBottom: n.url ? 18 : 0 }}>{n.body}</div>
+            {n.url && (
+              <a className="btn v" href={n.url} target="_blank" rel="noopener noreferrer">AI타임스에서 전체 기사 읽기 ↗</a>
+            )}
+          </>
         )}
       </div>
 

@@ -34,7 +34,7 @@ function parseMonthDay(date: string) {
 
 export default async function HomePage() {
   const posts = (await getPosts()).slice(0, 2);
-  const feed = getFeed(viewerOf(getCurrentUser())).slice(0, 3);
+  const feed = (await getFeed(viewerOf(getCurrentUser()))).slice(0, 3);
   const notices = seed.notices.slice(0, 2);
   const events = seed.events.slice(0, 2);
   return (
