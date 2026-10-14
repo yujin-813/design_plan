@@ -82,6 +82,12 @@ export default function SubscribeButton({ kind, id, label }: { kind: Kind; id: s
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ kind, id }),
       });
+      // 비회원은 구독할 수 없으니 로그인 화면으로 보냅니다.
+      if (res.status === 401) {
+        setOn(prev);
+        window.location.href = "/login";
+        return;
+      }
       if (!res.ok) throw new Error("failed");
       cache = { ...EMPTY, ...(await res.json()) };
       setOn(isSubscribed(kind, id));

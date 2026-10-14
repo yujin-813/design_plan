@@ -10,15 +10,17 @@ function blockedFromTopic(user: CurrentUser, topicId: string) {
   return !canJoinCohortChat(user, topicId.slice("cohort:".length));
 }
 
+// 비회원도 공개 화면의 댓글은 읽을 수 있습니다. 쓰기는 승인된 수강생만.
 export async function GET(req: NextRequest) {
   const user = getCurrentUser();
-  if (!user) return NextResponse.json({ error: "로그인이 필요해요." }, { status: 401 });
 
   const topicId = new URL(req.url).searchParams.get("topicId");
   if (!topicId) return NextResponse.json({ error: "topicId가 필요합니다." }, { status: 400 });
-  if (blockedFromTopic(user, topicId)) return NextResponse.json({ error: "이 대화방에 들어갈 수 없어요." }, { status: 403 });
+  if (!user && topicId.startsWith("cohort:")) return NextResponse.json({ error: "로그인이 필요해요." }, { status: 401 });
+  if (user && blockedFromTopic(user, topicId)) return NextResponse.json({ error: "이 대화방에 들어갈 수 없어요." }, { status: 403 });
 
-  return NextResponse.json({ comments: listComments(topicId, user.email) });
+  const writer = !user ? "guest" : user.role === "admin" || user.status === "approved" ? "ok" : "pending";
+  return NextResponse.json({ comments: listComments(topicId, user?.email ?? null), writer });
 }
 
 export async function POST(req: NextRequest) {

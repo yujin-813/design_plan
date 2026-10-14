@@ -18,9 +18,8 @@ const adminIcon = <><path d="M12 3l8 4v5c0 4.4-3.2 7.9-8 9-4.8-1.1-8-4.6-8-9V7z"
 const contentIcon = <><path d="M5 3h9l5 5v13H5z" /><path d="M14 3v5h5" /><path d="M9 13h6M9 17h4" /></>;
 
 // 승인 전 수강생·비로그인 방문자에게 보이는 메뉴
-const guestGroups: { label?: string; items: NavItem[] }[] = [
-  { label: "계정", items: [{ href: "/login", label: "로그인", icon: loginIcon }] },
-];
+// 비회원·승인 대기 메뉴 — 읽기만 되는 공개 커뮤니티 화면과 로그인 (groups 아래에서 채웁니다)
+const PUBLIC_HREFS = ["/", "/notices", "/events", "/community", "/news"];
 
 // 운영자 메뉴
 const adminGroups: { label?: string; items: NavItem[] }[] = [
@@ -98,6 +97,16 @@ const crumbMap: Record<string, string> = {
   "/admin/content": "콘텐츠 관리",
 };
 
+const guestAccountGroup: { label?: string; items: NavItem[] }[] = [
+  {
+    label: "계정",
+    items: [
+      { href: "/login", label: "로그인", icon: loginIcon },
+      { href: "/signup", label: "수강생 가입", icon: <><circle cx="10" cy="8" r="4" /><path d="M3 20a7 7 0 0114 0M19 8v6M16 11h6" /></> },
+    ],
+  },
+];
+
 export default function AppShell({
   profile,
   pendingCount = 0,
@@ -130,7 +139,12 @@ export default function AppShell({
       ]
     : approved
       ? groups
-      : guestGroups;
+      : [
+          ...groups
+            .map((g) => ({ ...g, items: g.items.filter((it) => PUBLIC_HREFS.includes(it.href)) }))
+            .filter((g) => g.items.length > 0),
+          ...(profile.signedIn ? [] : guestAccountGroup),
+        ];
 
   function toggleTheme() {
     const root = document.documentElement;
@@ -214,7 +228,7 @@ export default function AppShell({
             <b>{profile.name}</b>
             <small>
               {profile.cohort}
-              {isAdmin ? "" : profile.signedIn ? (approved ? " · 수강생" : " · 승인 대기") : " · 게스트"}
+              {isAdmin ? "" : profile.signedIn ? (approved ? " · 수강생" : " · 승인 대기") : ""}
             </small>
           </div>
           {REQUIRE_LOGIN && profile.signedIn && (

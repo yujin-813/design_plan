@@ -10,12 +10,14 @@ export default function CommentThread({ topicId }: { topicId: string }) {
   const [draft, setDraft] = useState("");
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
+  const [writer, setWriter] = useState<"ok" | "guest" | "pending">("ok");
 
   const load = useCallback(async () => {
     const res = await fetch(`/api/comments?topicId=${encodeURIComponent(topicId)}`);
     if (!res.ok) return;
     const j = await res.json();
     setComments(j.comments ?? []);
+    if (j.writer) setWriter(j.writer);
   }, [topicId]);
 
   useEffect(() => {
@@ -58,6 +60,15 @@ export default function CommentThread({ topicId }: { topicId: string }) {
         </div>
       ))}
       {err && <small style={{ color: "var(--danger)", display: "block", marginTop: 10 }}>{err}</small>}
+      {writer === "guest" && (
+        <p style={{ margin: "14px 0 0", fontSize: 13, color: "var(--muted)" }}>
+          <a className="more" href="/login">로그인</a>하면 댓글을 남길 수 있어요.
+        </p>
+      )}
+      {writer === "pending" && (
+        <p style={{ margin: "14px 0 0", fontSize: 13, color: "var(--muted)" }}>운영팀 승인 후에 댓글을 남길 수 있어요.</p>
+      )}
+      {writer === "ok" && (
       <form onSubmit={submit} style={{ display: "flex", gap: 8, marginTop: 14 }}>
         <input
           value={draft}
@@ -67,6 +78,7 @@ export default function CommentThread({ topicId }: { topicId: string }) {
         />
         <button className="btn v" type="submit" disabled={busy}>{busy ? "…" : "등록"}</button>
       </form>
+      )}
     </div>
   );
 }
