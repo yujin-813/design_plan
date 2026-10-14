@@ -1,15 +1,14 @@
 "use client";
-import Link from "next/link";
 import { useEffect, useState } from "react";
-import { seed } from "@/lib/seed";
 import { markRead, isRead } from "@/lib/interactionStore";
 
 type CommentView = { id: string; author: string; cohort: string; text: string; at: string; mine: boolean };
 
-type Article = (typeof seed.news)[number];
+/** 스크랩 한 줄. 구독한 매체 RSS 기사입니다. */
+export type ScrapItem = { topicKey: string; title: string; summary: string; source: string; ago: string; url: string; tk: string; cat: string };
 
-export default function ScrapArticle({ n, isLast }: { n: Article; isLast: boolean }) {
-  const topicId = `news:${n.id}`;
+export default function ScrapArticle({ n, isLast }: { n: ScrapItem; isLast: boolean }) {
+  const topicId = `news:${n.topicKey}`;
   const [open, setOpen] = useState(false);
   const [read, setRead] = useState(false);
   const [comments, setComments] = useState<CommentView[]>([]);
@@ -56,12 +55,12 @@ export default function ScrapArticle({ n, isLast }: { n: Article; isLast: boolea
   return (
     <div className="newscard" style={{ flexDirection: "column", alignItems: "stretch", cursor: "pointer", ...(isLast ? {} : { borderBottom: "1px solid var(--border)" }) }}>
       <div style={{ display: "flex", gap: 14 }} onClick={toggle}>
-        <span className={"tk tk-" + n.cat}>{n.tk}</span>
+        <span className={"tk tk-" + n.cat} style={{ alignSelf: "flex-start" }}>{n.tk}</span>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <Link href={`/news/${n.id}`} onClick={(e) => e.stopPropagation()} style={{ textDecoration: "none" }}>
-              <h4 style={{ margin: 0 }}>{n.title}</h4>
-            </Link>
+            <a href={n.url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} style={{ textDecoration: "none" }}>
+              <h4 style={{ margin: 0 }}>{n.title} <span style={{ fontSize: 11, color: "var(--faint)" }}>↗</span></h4>
+            </a>
             {read && <span className="pill ghost" style={{ fontSize: 10 }}>읽음</span>}
           </div>
           <p>{n.summary}</p>
