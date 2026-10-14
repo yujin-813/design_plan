@@ -88,7 +88,8 @@ export async function getArticles(publisherId: string): Promise<RssArticle[]> {
     const res = await fetch(pub.rss, {
       next: { revalidate: REVALIDATE_SECONDS },
       signal: AbortSignal.timeout(8000),
-      headers: { "User-Agent": "Mozilla/5.0 (altera community RSS reader)" },
+      // 일부 매체(모비인사이드)는 브라우저가 아닌 User-Agent를 서버 오류로 막아서 일반 브라우저 값을 씁니다.
+      headers: { "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36" },
     });
     if (!res.ok) return [];
     return parseRss(await res.text(), pub);
