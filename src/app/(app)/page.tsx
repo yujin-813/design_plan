@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { seed } from "@/lib/seed";
 import { getPosts } from "@/lib/data";
+import { getCurrentUser, viewerOf } from "@/lib/currentUser";
+import { getFeed } from "@/lib/feed";
 import MyAgenda from "@/components/MyAgenda";
 import { buildMonthGrid, monthLabel } from "@/lib/calendarGrid";
 
@@ -32,6 +34,7 @@ function parseMonthDay(date: string) {
 
 export default async function HomePage() {
   const posts = (await getPosts()).slice(0, 2);
+  const feed = getFeed(viewerOf(getCurrentUser())).slice(0, 3);
   const notices = seed.notices.slice(0, 2);
   const events = seed.events.slice(0, 2);
   return (
@@ -82,9 +85,9 @@ export default async function HomePage() {
             ))}
           </div>
 
-          <div className="bh"><h3>오늘의 AI 뉴스</h3><Link className="more" href="/news">전체 보기 ›</Link></div>
+          <div className="bh"><h3>오늘의 레터·뉴스</h3><Link className="more" href="/news">전체 보기 ›</Link></div>
           <div className="card"><div style={{ padding: "4px 18px" }}>
-            {seed.news.slice(0, 3).map((n) => (
+            {feed.map((n) => (
               <Link className="newsmini" href={`/news/${n.id}`} key={n.id} style={{ display: "flex" }}>
                 <span className={"tk tk-" + n.cat}>{n.tk}</span>
                 <div><p>{n.title}</p><small>{n.source} · {n.ago}</small></div>

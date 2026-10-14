@@ -1,12 +1,35 @@
 import Link from "next/link";
 import { seed } from "@/lib/seed";
+import { getCurrentUser, viewerOf } from "@/lib/currentUser";
+import { cohortIdOf, listVisible, shortDate } from "@/lib/content";
+import { cohorts } from "@/lib/curriculum";
+
+export const dynamic = "force-dynamic";
 
 const catClass: Record<string, string> = { "운영 공지": "v", "커뮤니티 활동": "warm", "시스템": "sky" };
 
-function NoticeRow({ n, isLast }: { n: (typeof seed.notices)[number]; isLast: boolean }) {
+type Row = {
+  id: string;
+  href: string;
+  category: string;
+  pinned: boolean;
+  title: string;
+  by: string;
+  date: string;
+  /** 특정 기수 전용이면 그 기수 이름 */
+  cohortLabel?: string;
+};
+
+function cohortLabelOf(scope: Parameters<typeof cohortIdOf>[0]) {
+  const id = cohortIdOf(scope);
+  if (!id) return undefined;
+  return cohorts.find((c) => c.id === id)?.label ?? "기수 전용";
+}
+
+function NoticeRow({ n, isLast }: { n: Row; isLast: boolean }) {
   return (
     <Link
-      href={`/notices/${n.id}`}
+      href={n.href}
       style={{
         display: "flex", alignItems: "center", gap: 14, padding: "16px 18px",
         borderBottom: isLast ? "none" : "1px solid var(--border)",
@@ -17,6 +40,7 @@ function NoticeRow({ n, isLast }: { n: (typeof seed.notices)[number]; isLast: bo
         <p style={{ margin: 0, fontWeight: 600, fontSize: 14 }}>
           {n.pinned && <span style={{ color: "var(--warm-ink)", marginRight: 6 }}>📌</span>}
           {n.title}
+          {n.cohortLabel && <span className="pill v" style={{ marginLeft: 8 }}>{n.cohortLabel}</span>}
         </p>
         <small style={{ color: "var(--faint)" }}>{n.by} · {n.date}</small>
       </div>
@@ -25,10 +49,36 @@ function NoticeRow({ n, isLast }: { n: (typeof seed.notices)[number]; isLast: bo
 }
 
 export default function NoticesPage() {
-  const pinned = seed.notices.filter((n) => n.pinned);
+  const user = getCurrentUser();
+  const viewer = viewerOf(user);
+
+  // 운영자가 올린 공지 + 기존 시드 공지를 함께 보여줍니다.
+  const authored: Row[] = listVisible("notice", viewer).map((c) => ({
+    id: c.id,
+    href: `/notices/${c.id}`,
+    category: c.category ?? "운영 공지",
+    pinned: Boolean(c.pinned),
+    title: c.title,
+    by: c.createdBy,
+    date: shortDate(c.createdAt),
+    cohortLabel: cohortLabelOf(c.scope),
+  }));
+
+  const seeded: Row[] = seed.notices.map((n) => ({
+    id: String(n.id),
+    href: `/notices/${n.id}`,
+    category: n.category,
+    pinned: Boolean(n.pinned),
+    title: n.title,
+    by: n.by,
+    date: n.date,
+  }));
+
+  const all = [...authored, ...seeded];
+  const pinned = all.filter((n) => n.pinned);
   const groups = seed.noticeCategories.filter((c) => c !== "전체").map((cat) => ({
     cat,
-    items: seed.notices.filter((n) => n.category === cat && !n.pinned),
+    items: all.filter((n) => n.category === cat && !n.pinned),
   }));
 
   return (

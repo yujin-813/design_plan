@@ -11,7 +11,9 @@ export type Submission = {
   fileName: string;
   url: string;
   size: number;
-  submittedBy: string;
+  submittedBy: string;      // 표시용 이름 (서버가 세션에서 채웁니다)
+  submittedByEmail: string; // 실제 주인. 이 값이 소유권의 기준입니다.
+  cohortId: string | null;  // 제출 당시 기수
   submittedAt: string;
 };
 
@@ -23,7 +25,8 @@ function ensure() {
 export function readSubmissions(): Submission[] {
   ensure();
   try {
-    return JSON.parse(fs.readFileSync(DATA_FILE, "utf-8"));
+    const raw = JSON.parse(fs.readFileSync(DATA_FILE, "utf-8"));
+    return Array.isArray(raw) ? raw : [];
   } catch {
     return [];
   }

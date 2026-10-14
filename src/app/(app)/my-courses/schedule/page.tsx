@@ -1,6 +1,15 @@
-import CurriculumCalendar from "@/components/CurriculumCalendar";
+import ScheduleTabs, { type ScheduleTab } from "@/components/mycourses/ScheduleTabs";
+import { getMyRooms } from "@/lib/cohortRoom";
+
+export const dynamic = "force-dynamic";
 
 export default function MyCoursesSchedulePage() {
+  const tabs: ScheduleTab[] = getMyRooms().map((r) => ({
+    cohortId: r.cohortId,
+    label: r.cohort.label,
+    stateLabel: r.stateLabel,
+  }));
+
   return (
     <>
       <div className="phead">
@@ -8,7 +17,7 @@ export default function MyCoursesSchedulePage() {
       </div>
 
       <div className="card" style={{ padding: 28 }}>
-        <CurriculumCalendar />
+        <ScheduleTabs tabs={tabs} />
       </div>
     </>
   );

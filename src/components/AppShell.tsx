@@ -4,6 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import Logo from "./Logo";
 import { REQUIRE_LOGIN } from "@/lib/session";
+import { clearSubscriptionCache } from "./SubscribeButton";
 
 type Profile = { name: string; cohort: string; role: string; status?: string; signedIn?: boolean };
 type NavChild = { href: string; label: string };
@@ -14,6 +15,7 @@ const loginIcon = <><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4" /><path d="
 const logoutIcon = <><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" /><path d="M16 17l5-5-5-5M21 12H9" /></>;
 
 const adminIcon = <><path d="M12 3l8 4v5c0 4.4-3.2 7.9-8 9-4.8-1.1-8-4.6-8-9V7z" /><path d="M9 12l2 2 4-4" /></>;
+const contentIcon = <><path d="M5 3h9l5 5v13H5z" /><path d="M14 3v5h5" /><path d="M9 13h6M9 17h4" /></>;
 
 // 승인 전 수강생·비로그인 방문자에게 보이는 메뉴
 const guestGroups: { label?: string; items: NavItem[] }[] = [
@@ -22,7 +24,13 @@ const guestGroups: { label?: string; items: NavItem[] }[] = [
 
 // 운영자 메뉴
 const adminGroups: { label?: string; items: NavItem[] }[] = [
-  { label: "운영", items: [{ href: "/admin/members", label: "가입자 관리", icon: adminIcon }] },
+  {
+    label: "운영",
+    items: [
+      { href: "/admin/members", label: "가입자 관리", icon: adminIcon },
+      { href: "/admin/content", label: "콘텐츠 관리", icon: contentIcon },
+    ],
+  },
 ];
 
 const groups: { label?: string; items: NavItem[] }[] = [
@@ -37,7 +45,8 @@ const groups: { label?: string; items: NavItem[] }[] = [
     label: "커뮤니티",
     items: [
       { href: "/community", label: "자유수다", icon: <><path d="M4 5h16v11H8l-4 4z" /><path d="M8 9h8M8 12h5" /></> },
-      { href: "/news", label: "AI 뉴스", icon: <><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 3" /></> },
+      { href: "/news", label: "레터·뉴스", icon: <><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 3" /></> },
+      { href: "/projects", label: "프로젝트", icon: <><path d="M4 8h16v11H4z" /><path d="M9 8V5h6v3M4 13h16" /></> },
     ],
   },
   {
@@ -60,7 +69,6 @@ const groups: { label?: string; items: NavItem[] }[] = [
         ],
       },
       { href: "/programs", label: "강의목록", icon: <><path d="M12 3l9 5-9 5-9-5 9-5z" /><path d="M6 10.5V16c0 1.5 2.7 3 6 3s6-1.5 6-3v-5.5" /></> },
-      { href: "/alumni", label: "취업정보", icon: <><path d="M12 3l9 4.5-9 4.5-9-4.5L12 3z" /><path d="M6 10v5c1 2 4 3 6 3s5-1 6-3v-5" /></> },
       { href: "/mentors", label: "멘토링 신청", icon: <><circle cx="9" cy="8" r="3" /><path d="M3 20a6 6 0 0112 0M17 11l2 2 4-4" /></> },
     ],
   },
@@ -82,11 +90,12 @@ const groups: { label?: string; items: NavItem[] }[] = [
 
 const crumbMap: Record<string, string> = {
   "/": "홈", "/notices": "공지사항", "/events": "이벤트", "/community": "자유수다",
-  "/news": "AI 뉴스", "/subscriptions": "구독", "/scrap": "스크랩",
+  "/news": "레터·뉴스", "/subscriptions": "구독", "/scrap": "스크랩",
   "/my-courses": "내 수업", "/my-courses/notices": "공지보기", "/my-courses/materials": "자료실",
   "/my-courses/assignments": "과제확인", "/my-courses/schedule": "일정확인",
-  "/programs": "강의목록", "/alumni": "취업정보", "/docs": "기획서",
+  "/programs": "강의목록", "/projects": "프로젝트", "/docs": "기획서",
   "/mentors": "멘토링 신청", "/profile": "프로필", "/admin/members": "가입자 관리",
+  "/admin/content": "콘텐츠 관리",
 };
 
 export default function AppShell({
@@ -132,6 +141,8 @@ export default function AppShell({
 
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST" });
+    // 같은 브라우저를 다른 사람이 써도 이전 사람 구독이 남지 않도록 비웁니다.
+    clearSubscriptionCache();
     router.push("/login");
     router.refresh();
   }

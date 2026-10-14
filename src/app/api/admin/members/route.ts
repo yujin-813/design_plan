@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/currentUser";
-import { counts, decideMember, listMembers, removeMember } from "@/lib/members";
+import { counts, decideMember, findById, listMembers, removeMember } from "@/lib/members";
+import { removeStore } from "@/lib/subscriptions";
+import { removeAllFor } from "@/lib/enrollments";
 
 export const runtime = "nodejs";
 
@@ -38,6 +40,14 @@ export async function DELETE(req: NextRequest) {
 
   const id = new URL(req.url).searchParams.get("id");
   if (!id) return NextResponse.json({ error: "id가 필요합니다." }, { status: 400 });
-  if (!removeMember(id)) return NextResponse.json({ error: "가입자를 찾을 수 없어요." }, { status: 404 });
+
+  const target = findById(id);
+  if (!target || !removeMember(id)) {
+    return NextResponse.json({ error: "가입자를 찾을 수 없어요." }, { status: 404 });
+  }
+  // 회원이 사라지면 구독·수강 기록도 남겨둘 이유가 없습니다.
+  removeStore(target.email);
+  removeAllFor(target.email);
+
   return NextResponse.json({ ok: true, counts: counts() });
 }

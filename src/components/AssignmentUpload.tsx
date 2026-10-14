@@ -9,7 +9,8 @@ function formatSize(bytes: number) {
   return `${(bytes / (1024 * 1024)).toFixed(1)}MB`;
 }
 
-export default function AssignmentUpload({ programId, assignment, submittedBy }: { programId: string; assignment: string; submittedBy: string }) {
+// 제출자 이름은 서버가 세션에서 채웁니다. 클라이언트가 보내지 않습니다.
+export default function AssignmentUpload({ programId, assignment }: { programId: string; assignment: string }) {
   const [subs, setSubs] = useState<Submission[]>([]);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
@@ -37,7 +38,6 @@ export default function AssignmentUpload({ programId, assignment, submittedBy }:
     fd.append("file", file);
     fd.append("programId", programId);
     fd.append("assignment", assignment);
-    fd.append("submittedBy", submittedBy);
     setBusy(true);
     const res = await fetch("/api/submissions", { method: "POST", body: fd });
     setBusy(false);

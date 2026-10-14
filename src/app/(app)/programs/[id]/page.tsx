@@ -4,12 +4,17 @@ import { seed } from "@/lib/seed";
 import SubscribeButton from "@/components/SubscribeButton";
 import ProgramRoom from "@/components/ProgramRoom";
 import ProgramAlumni from "@/components/ProgramAlumni";
+import { getCurrentUser, viewerOf } from "@/lib/currentUser";
+import { listVisible } from "@/lib/content";
+
+export const dynamic = "force-dynamic";
 
 const statusPill: Record<string, string> = { "모집 중": "mint", "진행 중": "v", "수료": "ghost", "오픈 예정": "sky" };
 
 export default function ProgramDetailPage({ params }: { params: { id: string } }) {
   const p = seed.programs.find((x) => x.id === params.id);
   if (!p) notFound();
+  const projects = listVisible("project", viewerOf(getCurrentUser())).filter((x) => !x.closed).slice(0, 3);
 
   return (
     <>
@@ -45,7 +50,7 @@ export default function ProgramDetailPage({ params }: { params: { id: string } }
       <div style={{ marginBottom: 26 }}><ProgramRoom p={p} /></div>
 
       <div className="bh"><h3>수료 후에도 계속 보이는 정보</h3></div>
-      <ProgramAlumni p={p} />
+      <ProgramAlumni p={p} projects={projects} />
     </>
   );
 }
